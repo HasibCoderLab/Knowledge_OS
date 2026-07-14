@@ -21,7 +21,7 @@ const NoteCard: React.FC<NoteCardProps> = ({ note, onEdit, onDelete, onTogglePin
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] as const }}
       whileHover={{ y: -3 }}
       className={`
         group flex flex-col bg-white dark:bg-slate-900 border rounded-2xl transition-all duration-200 h-full

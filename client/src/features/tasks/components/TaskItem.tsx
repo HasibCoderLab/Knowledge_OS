@@ -27,7 +27,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onEdit, onDelete, onToggle, i
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: index * 0.04, ease: [0.25, 0.1, 0.25, 1] }}
+      transition={{ duration: 0.3, delay: index * 0.04, ease: [0.25, 0.1, 0.25, 1] as const }}
       className={`group bg-white dark:bg-slate-900 border rounded-xl transition-all hover:shadow-sm ${
         task.isCompleted
           ? 'border-slate-200 dark:border-slate-800 opacity-70'

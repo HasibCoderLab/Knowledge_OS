@@ -21,7 +21,7 @@ const NoteListItem: React.FC<NoteListItemProps> = ({ note, onEdit, onDelete, onT
     <motion.div
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] as const }}
       className={`
         flex items-start gap-4 p-4 bg-white dark:bg-slate-900 border rounded-xl transition-all duration-200
         ${note.isPinned

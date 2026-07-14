@@ -24,8 +24,8 @@ const BookCard: React.FC<BookCardProps> = ({ book, onClick, index = 0 }) => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.05, ease: [0.25, 0.1, 0.25, 1] }}
-      whileHover={{ y: -6, transition: { duration: 0.25, ease: 'easeOut' } }}
+      transition={{ duration: 0.4, delay: index * 0.05, ease: [0.25, 0.1, 0.25, 1] as const }}
+      whileHover={{ y: -6, transition: { duration: 0.25, ease: 'easeOut' as const } }}
       onClick={onClick}
       className="group relative flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden cursor-pointer h-full shadow-sm hover:shadow-xl dark:hover:shadow-slate-900/60 transition-shadow duration-300"
     >
@@ -81,7 +81,7 @@ const BookCard: React.FC<BookCardProps> = ({ book, onClick, index = 0 }) => {
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${progress}%` }}
-                  transition={{ duration: 1, delay: 0.2, ease: 'easeOut' }}
+                  transition={{ duration: 1, delay: 0.2, ease: 'easeOut' as const }}
                   className="h-full bg-indigo-500 rounded-full"
                 />
               </div>

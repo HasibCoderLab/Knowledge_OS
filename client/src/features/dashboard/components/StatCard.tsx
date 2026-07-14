@@ -41,7 +41,7 @@ const StatCard: React.FC<StatCardProps> = ({ label, value, icon: Icon, trend, co
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.05, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.4, delay: index * 0.05, ease: [0.16, 1, 0.3, 1] as const }}
     >
       <Card className="flex flex-col gap-3 md:gap-4">
         <div className="flex items-center justify-between">

@@ -126,7 +126,7 @@ export const Library: React.FC = () => {
       <motion.header
         variants={{
           hidden: { opacity: 0, y: -10 },
-          visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } },
+          visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' as const } },
         }}
         className="flex flex-col md:flex-row md:items-end justify-between gap-4"
       >
@@ -149,7 +149,7 @@ export const Library: React.FC = () => {
       <motion.div
         variants={{
           hidden: { opacity: 0, y: -8 },
-          visible: { opacity: 1, y: 0, transition: { duration: 0.35, delay: 0.1, ease: 'easeOut' } },
+          visible: { opacity: 1, y: 0, transition: { duration: 0.35, delay: 0.1, ease: 'easeOut' as const } },
         }}
       >
         <LibraryFilters
@@ -307,7 +307,7 @@ export const Library: React.FC = () => {
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${(book.currentPage / book.totalPages) * 100}%` }}
-                      transition={{ duration: 1, ease: 'easeOut' }}
+                      transition={{ duration: 1, ease: 'easeOut' as const }}
                       className="h-full bg-indigo-500 rounded-full"
                     />
                   </div>

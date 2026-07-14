@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import MainLayout from './layouts/MainLayout';
 import ToastContainer from './components/ui/Toast';
@@ -20,6 +20,9 @@ const Profile = lazy(() => import('./pages/profile/Profile').then(m => ({ defaul
 const SettingsPage = lazy(() => import('./pages/settings/Settings').then(m => ({ default: m.SettingsPage })));
 const Search = lazy(() => import('./pages/search/Search').then(m => ({ default: m.Search })));
 const Notifications = lazy(() => import('./pages/notifications/Notifications').then(m => ({ default: m.Notifications })));
+const Login = lazy(() => import('./pages/auth/Login').then(m => ({ default: m.Login })));
+const Register = lazy(() => import('./pages/auth/Register').then(m => ({ default: m.Register })));
+const NotFound = lazy(() => import('./pages/not-found/NotFound').then(m => ({ default: m.NotFound })));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -62,8 +65,10 @@ function App() {
               <Route path="/search" element={<Search />} />
               <Route path="/notifications" element={<Notifications />} />
             </Route>
+            <Route path="/auth/login" element={<Login />} />
+            <Route path="/auth/register" element={<Register />} />
             <Route path="/" element={<LandingPage />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
       </BrowserRouter>

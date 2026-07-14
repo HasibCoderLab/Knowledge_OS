@@ -36,7 +36,7 @@ const GoalCard: React.FC<GoalCardProps> = ({ goal, onEdit, onDelete, index = 0 }
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, delay: index * 0.05, ease: [0.25, 0.1, 0.25, 1] }}
+      transition={{ duration: 0.35, delay: index * 0.05, ease: [0.25, 0.1, 0.25, 1] as const }}
       className="group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 hover:shadow-lg dark:hover:shadow-slate-900/60 transition-shadow h-full flex flex-col"
     >
       <div className="flex items-start justify-between gap-2 mb-3">
@@ -78,7 +78,7 @@ const GoalCard: React.FC<GoalCardProps> = ({ goal, onEdit, onDelete, index = 0 }
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${goal.progress}%` }}
-              transition={{ duration: 1, delay: 0.15, ease: 'easeOut' }}
+              transition={{ duration: 1, delay: 0.15, ease: 'easeOut' as const }}
               className={`h-full rounded-full ${goal.progress === 100 ? 'bg-emerald-500' : 'bg-indigo-500'}`}
             />
           </div>

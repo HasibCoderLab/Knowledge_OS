@@ -19,7 +19,7 @@ const LandingPage: React.FC = () => {
   const navigate = useNavigate();
 
   const handleGoToApp = () => {
-    navigate('/dashboard');
+    navigate('/auth/login');
   };
 
   const features = [
