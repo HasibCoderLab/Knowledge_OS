@@ -33,7 +33,7 @@ const MainLayout: React.FC = () => {
         </header>
 
         <main className="flex-1 overflow-y-auto">
-          <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
+          <div className="p-5 md:p-8 lg:p-10 max-w-7xl mx-auto">
             <Outlet />
           </div>
         </main>

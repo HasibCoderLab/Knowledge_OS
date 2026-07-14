@@ -25,13 +25,13 @@ const NoteFilters: React.FC<NoteFiltersProps> = ({
   return (
     <div className={`flex flex-col sm:flex-row gap-3 ${className}`}>
       <div className="relative flex-1">
-        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+        <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Search notes by title or content..."
-          className="w-full pl-9 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm outline-none transition-all focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder-slate-400"
+          className="w-full pl-9 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm outline-none transition-all focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder-slate-400 dark:text-slate-200 dark:placeholder-slate-500"
           aria-label="Search notes"
         />
       </div>
@@ -45,7 +45,7 @@ const NoteFilters: React.FC<NoteFiltersProps> = ({
               flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all
               ${activeFilter === option.value
                 ? 'bg-indigo-600 text-white shadow-sm'
-                : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-indigo-300 dark:hover:border-indigo-700'
+                : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
               }
             `}
           >
@@ -60,9 +60,9 @@ const NoteFilters: React.FC<NoteFiltersProps> = ({
           </button>
         ))}
 
-        <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1" />
+        <div className="w-px h-5 bg-slate-200 dark:bg-slate-700 mx-1" />
 
-        <div className="flex border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
+        <div className="flex border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden shrink-0">
           <button
             onClick={() => onViewModeChange('grid')}
             className={`p-2 transition-colors ${
@@ -73,7 +73,7 @@ const NoteFilters: React.FC<NoteFiltersProps> = ({
             aria-label="Grid view"
             aria-pressed={viewMode === 'grid'}
           >
-            <LayoutGrid size={16} />
+            <LayoutGrid size={15} />
           </button>
           <button
             onClick={() => onViewModeChange('list')}
@@ -85,7 +85,7 @@ const NoteFilters: React.FC<NoteFiltersProps> = ({
             aria-label="List view"
             aria-pressed={viewMode === 'list'}
           >
-            <List size={16} />
+            <List size={15} />
           </button>
         </div>
       </div>

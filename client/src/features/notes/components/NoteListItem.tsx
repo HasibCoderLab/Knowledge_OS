@@ -1,6 +1,5 @@
 import React from 'react';
 import { Pin, Star, Edit3, Trash2, MoreHorizontal, Calendar, FileText } from 'lucide-react';
-import Badge from '../../../components/ui/Badge';
 import Dropdown from '../../../components/ui/Dropdown';
 import type { Note } from '../../../types';
 
@@ -13,8 +12,8 @@ interface NoteListItemProps {
 }
 
 const NoteListItem: React.FC<NoteListItemProps> = ({ note, onEdit, onDelete, onTogglePin, onToggleFavorite }) => {
-  const preview = note.content.length > 80
-    ? note.content.slice(0, 80) + '...'
+  const preview = note.content.length > 100
+    ? note.content.slice(0, 100) + '...'
     : note.content;
 
   return (
@@ -27,26 +26,26 @@ const NoteListItem: React.FC<NoteListItemProps> = ({ note, onEdit, onDelete, onT
         }
       `}
     >
-      <div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 shrink-0 mt-0.5">
-        <FileText size={16} className="text-slate-500 dark:text-slate-400" />
+      <div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 shrink-0">
+        <FileText size={15} className="text-slate-500 dark:text-slate-400" />
       </div>
 
       <div className="flex-1 min-w-0">
-        <div className="flex items-start justify-between gap-2">
+        <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">
                 {note.title}
               </h3>
-              {note.isPinned && <Pin size={12} className="text-indigo-400 shrink-0" />}
-              {note.isFavorite && <Star size={12} className="fill-amber-400 text-amber-400 shrink-0" />}
+              {note.isPinned && <Pin size={11} className="text-indigo-400 shrink-0" />}
+              {note.isFavorite && <Star size={11} className="fill-amber-400 text-amber-400 shrink-0" />}
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-1">
               {preview}
             </p>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1 shrink-0">
             <button
               onClick={() => onTogglePin(note)}
               className={`p-1.5 rounded-lg transition-colors ${
@@ -56,7 +55,7 @@ const NoteListItem: React.FC<NoteListItemProps> = ({ note, onEdit, onDelete, onT
               }`}
               aria-label={note.isPinned ? 'Unpin note' : 'Pin note'}
             >
-              <Pin size={14} />
+              <Pin size={13} />
             </button>
             <button
               onClick={() => onToggleFavorite(note)}
@@ -67,10 +66,10 @@ const NoteListItem: React.FC<NoteListItemProps> = ({ note, onEdit, onDelete, onT
               }`}
               aria-label={note.isFavorite ? 'Unfavorite note' : 'Favorite note'}
             >
-              <Star size={14} />
+              <Star size={13} />
             </button>
             <Dropdown
-              trigger={<MoreHorizontal size={16} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300" />}
+              trigger={<MoreHorizontal size={15} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300" />}
               align="right"
               items={[
                 { label: 'Edit', icon: <Edit3 size={14} />, onClick: () => onEdit(note) },
@@ -80,13 +79,13 @@ const NoteListItem: React.FC<NoteListItemProps> = ({ note, onEdit, onDelete, onT
           </div>
         </div>
 
-        <div className="flex items-center gap-3 mt-2">
+        <div className="flex items-center gap-3 mt-2.5">
           {note.tags.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {note.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-[10px] font-medium text-slate-500 dark:text-slate-400"
+                  className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 rounded-md text-[10px] font-medium text-slate-500 dark:text-slate-400"
                 >
                   #{tag}
                 </span>

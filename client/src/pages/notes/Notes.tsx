@@ -125,7 +125,7 @@ export const Notes: React.FC = () => {
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Capture your thoughts and ideas</p>
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {Array.from({ length: 8 }).map((_, i) => (
             <div key={i} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 space-y-3">
               <Skeleton className="h-5 w-3/4" />
@@ -178,7 +178,7 @@ export const Notes: React.FC = () => {
           />
         )
       ) : viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {filteredNotes.map((note) => (
             <NoteCard
               key={note.id}

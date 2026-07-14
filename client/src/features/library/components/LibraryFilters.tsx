@@ -1,5 +1,6 @@
 import React from 'react';
-import { Search, SlidersHorizontal } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Search } from 'lucide-react';
 
 interface FilterOption {
   value: string;
@@ -25,41 +26,42 @@ const LibraryFilters: React.FC<LibraryFiltersProps> = ({
   className = '',
 }) => {
   return (
-    <div className={`flex flex-col sm:flex-row gap-3 ${className}`}>
-      <div className="relative flex-1">
-        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+    <div className={`space-y-4 ${className}`}>
+      <div className="relative max-w-md">
+        <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Search books by title or author..."
-          className="w-full pl-9 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm outline-none transition-all focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder-slate-400"
+          className="w-full pl-11 pr-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none transition-all focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder:text-slate-400 dark:placeholder:text-slate-500 dark:text-slate-200"
           aria-label="Search books"
         />
       </div>
 
-      <div className="flex gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+      <div className="flex flex-wrap gap-2">
         {filterOptions.map((option) => (
-          <button
+          <motion.button
             key={option.value}
+            whileTap={{ scale: 0.96 }}
             onClick={() => onFilterChange(option.value)}
             className={`
-              flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all
+              flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all
               ${activeFilter === option.value
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-indigo-300 dark:hover:border-indigo-700'
+                ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/25'
+                : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600'
               }
             `}
           >
             {option.label}
             {option.count !== undefined && (
-              <span className={`text-[10px] font-bold ${
+              <span className={`text-[10px] font-bold tabular-nums ${
                 activeFilter === option.value ? 'text-indigo-200' : 'text-slate-400'
               }`}>
                 {option.count}
               </span>
             )}
-          </button>
+          </motion.button>
         ))}
       </div>
     </div>
