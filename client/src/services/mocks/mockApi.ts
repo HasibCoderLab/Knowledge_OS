@@ -9,6 +9,30 @@ import {
   MOCK_READING_SESSIONS,
   MOCK_EVENTS,
   MOCK_NOTIFICATIONS,
+  MOCK_CALENDAR_MOODS,
+  MOCK_HEATMAP_DATA,
+  MOCK_CALENDAR_SUGGESTIONS,
+  MOCK_RADAR_DATA,
+  MOCK_KNOWLEDGE_SCORE,
+  MOCK_LEARNING_HEATMAP,
+  MOCK_DAILY_ACTIVITY,
+  MOCK_READING_TREND,
+  MOCK_KNOWLEDGE_GROWTH,
+  MOCK_FOCUS_HOURS,
+  MOCK_CATEGORY_DISTRIBUTION,
+  MOCK_WEEKLY_REPORTS,
+  MOCK_MONTHLY_REPORTS,
+  MOCK_AI_INSIGHTS,
+  FIRST_EVENT_MILESTONES,
+  ACHIEVEMENT_MILESTONES,
+  MOCK_DAILY_SUMMARIES,
+  MOCK_WEEKLY_REVIEWS,
+  MOCK_MONTHLY_REVIEWS,
+  MOCK_YEARLY_REVIEW,
+  MOCK_PRODUCTIVITY_SCORE,
+  MOCK_TIMELINE_INSIGHTS,
+  MOCK_TIMELINE_ENTRIES,
+  MOCK_DAY_SCHEDULES,
 } from './mockData';
 import type {
   User, Book, Note, Habit, Goal, Task,
@@ -18,7 +42,11 @@ import type {
 import type {
   AnalyticsDataPoint, AnalyticsCategory,
   WeeklyReport, MonthlyReport, AIInsight,
-  DaySchedule,
+  DaySchedule, CalendarMood, HeatmapDay, CalendarSuggestion,
+  RadarMetric, KnowledgeScoreBreakdown, LearningHeatmapDay,
+  TimelineMilestone, AchievementMilestone, DailySummaryData,
+  WeeklyReviewData, MonthlyReviewData, YearlyReviewData,
+  ProductivityScoreData, TimelineInsight, TimelineEntry,
 } from './mockData';
 
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
@@ -314,6 +342,82 @@ export const mockApi = {
   async getEvents(): Promise<ApiResponse<CalendarEvent[]>> {
     await sleep(400);
     return { success: true, data: MOCK_EVENTS };
+  },
+
+  async getCalendarMoods(): Promise<ApiResponse<CalendarMood[]>> {
+    await sleep(300);
+    return { success: true, data: MOCK_CALENDAR_MOODS };
+  },
+
+  async getHeatmapData(): Promise<ApiResponse<HeatmapDay[]>> {
+    await sleep(300);
+    return { success: true, data: MOCK_HEATMAP_DATA };
+  },
+
+  async getCalendarSuggestions(): Promise<ApiResponse<CalendarSuggestion[]>> {
+    await sleep(200);
+    return { success: true, data: MOCK_CALENDAR_SUGGESTIONS };
+  },
+
+  async getRadarData(): Promise<ApiResponse<RadarMetric[]>> {
+    await sleep(400);
+    return { success: true, data: MOCK_RADAR_DATA };
+  },
+
+  async getKnowledgeScore(): Promise<ApiResponse<KnowledgeScoreBreakdown[]>> {
+    await sleep(400);
+    return { success: true, data: MOCK_KNOWLEDGE_SCORE };
+  },
+
+  async getLearningHeatmap(): Promise<ApiResponse<LearningHeatmapDay[]>> {
+    await sleep(400);
+    return { success: true, data: MOCK_LEARNING_HEATMAP };
+  },
+
+  // Timeline / Living Calendar
+  async getFirstEventMilestones(): Promise<ApiResponse<TimelineMilestone[]>> {
+    await sleep(200);
+    return { success: true, data: FIRST_EVENT_MILESTONES };
+  },
+
+  async getAchievementMilestones(): Promise<ApiResponse<AchievementMilestone[]>> {
+    await sleep(200);
+    return { success: true, data: ACHIEVEMENT_MILESTONES };
+  },
+
+  async getDailySummaries(): Promise<ApiResponse<DailySummaryData[]>> {
+    await sleep(200);
+    return { success: true, data: MOCK_DAILY_SUMMARIES };
+  },
+
+  async getWeeklyReviews(): Promise<ApiResponse<WeeklyReviewData[]>> {
+    await sleep(200);
+    return { success: true, data: MOCK_WEEKLY_REVIEWS };
+  },
+
+  async getMonthlyReviews(): Promise<ApiResponse<MonthlyReviewData[]>> {
+    await sleep(200);
+    return { success: true, data: MOCK_MONTHLY_REVIEWS };
+  },
+
+  async getYearlyReview(): Promise<ApiResponse<YearlyReviewData>> {
+    await sleep(300);
+    return { success: true, data: MOCK_YEARLY_REVIEW };
+  },
+
+  async getProductivityScore(): Promise<ApiResponse<ProductivityScoreData>> {
+    await sleep(200);
+    return { success: true, data: MOCK_PRODUCTIVITY_SCORE };
+  },
+
+  async getTimelineInsights(): Promise<ApiResponse<TimelineInsight[]>> {
+    await sleep(200);
+    return { success: true, data: MOCK_TIMELINE_INSIGHTS };
+  },
+
+  async getTimelineEntries(): Promise<ApiResponse<TimelineEntry[]>> {
+    await sleep(300);
+    return { success: true, data: MOCK_TIMELINE_ENTRIES };
   },
 
   // Notifications

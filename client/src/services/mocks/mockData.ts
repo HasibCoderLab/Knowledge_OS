@@ -795,6 +795,63 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
   },
 ];
 
+// ── Calendar Mood Data ─────────────────────────────────
+
+export interface CalendarMood {
+  date: string;
+  mood: 'great' | 'good' | 'neutral' | 'bad' | 'terrible';
+}
+
+export const MOCK_CALENDAR_MOODS: CalendarMood[] = [
+  { date: '2024-03-15', mood: 'great' },
+  { date: '2024-03-14', mood: 'good' },
+  { date: '2024-03-13', mood: 'neutral' },
+  { date: '2024-03-12', mood: 'bad' },
+  { date: '2024-03-11', mood: 'great' },
+  { date: '2024-03-10', mood: 'great' },
+  { date: '2024-03-09', mood: 'good' },
+  { date: '2024-03-08', mood: 'good' },
+  { date: '2024-03-07', mood: 'great' },
+  { date: '2024-03-06', mood: 'good' },
+  { date: '2024-03-05', mood: 'great' },
+  { date: '2024-03-04', mood: 'great' },
+  { date: '2024-03-03', mood: 'bad' },
+  { date: '2024-03-02', mood: 'good' },
+  { date: '2024-03-01', mood: 'neutral' },
+];
+
+// ── Calendar Heatmap Data ──────────────────────────────
+
+export interface HeatmapDay {
+  date: string;
+  count: number;
+}
+
+export const MOCK_HEATMAP_DATA: HeatmapDay[] = Array.from({ length: 90 }, (_, i) => {
+  const d = new Date();
+  d.setDate(d.getDate() - (89 - i));
+  const dateStr = d.toISOString().split('T')[0]!;
+  return {
+    date: dateStr,
+    count: Math.floor(Math.random() * 8),
+  };
+});
+
+// ── Calendar AI Suggestions ────────────────────────────
+
+export interface CalendarSuggestion {
+  id: string;
+  type: 'reading' | 'focus' | 'break' | 'journal' | 'planning';
+  message: string;
+  priority: 'high' | 'medium' | 'low';
+}
+
+export const MOCK_CALENDAR_SUGGESTIONS: CalendarSuggestion[] = [
+  { id: 'cs-1', type: 'reading', message: 'No reading session scheduled tomorrow. Add one to maintain your 12-day streak.', priority: 'high' },
+  { id: 'cs-2', type: 'focus', message: 'Best focus window today: 8 PM – 10 PM. Schedule deep work then.', priority: 'medium' },
+  { id: 'cs-3', type: 'journal', message: 'You haven\'t journaled today. Evening reflection helps retention.', priority: 'low' },
+];
+
 // ── Analytics Mock Data ──────────────────────────────────
 
 export interface AnalyticsDataPoint {
@@ -831,6 +888,56 @@ export interface AIInsight {
   trend: 'up' | 'down' | 'neutral';
   percentage?: number;
 }
+
+// Radar data for analytics
+export interface RadarMetric {
+  category: string;
+  value: number;
+  fullMark: number;
+}
+
+export const MOCK_RADAR_DATA: RadarMetric[] = [
+  { category: 'Reading', value: 85, fullMark: 100 },
+  { category: 'Journal', value: 62, fullMark: 100 },
+  { category: 'Focus', value: 78, fullMark: 100 },
+  { category: 'Tasks', value: 91, fullMark: 100 },
+  { category: 'Habits', value: 70, fullMark: 100 },
+  { category: 'Goals', value: 55, fullMark: 100 },
+];
+
+// Knowledge score breakdown
+export interface KnowledgeScoreBreakdown {
+  label: string;
+  score: number;
+  maxScore: number;
+}
+
+export const MOCK_KNOWLEDGE_SCORE: KnowledgeScoreBreakdown[] = [
+  { label: 'Reading Consistency', score: 85, maxScore: 100 },
+  { label: 'Note Taking', score: 72, maxScore: 100 },
+  { label: 'Journal Frequency', score: 60, maxScore: 100 },
+  { label: 'Task Completion', score: 92, maxScore: 100 },
+  { label: 'Habit Adherence', score: 68, maxScore: 100 },
+  { label: 'Goal Progress', score: 55, maxScore: 100 },
+];
+
+// Learning heatmap data
+export interface LearningHeatmapDay {
+  date: string;
+  hours: number;
+  type: 'reading' | 'coding' | 'writing' | 'studying';
+}
+
+export const MOCK_LEARNING_HEATMAP: LearningHeatmapDay[] = Array.from({ length: 42 }, (_, i) => {
+  const d = new Date();
+  d.setDate(d.getDate() - (41 - i));
+  const types: LearningHeatmapDay['type'][] = ['reading', 'coding', 'writing', 'studying'];
+  return {
+    date: d.toISOString().split('T')[0]!,
+    hours: Math.round(Math.random() * 4 * 10) / 10,
+    type: types[Math.floor(Math.random() * 4)]!,
+  };
+});
 
 export const MOCK_DAILY_ACTIVITY: AnalyticsDataPoint[] = [
   { date: 'Mon', value: 4 },
@@ -953,6 +1060,20 @@ export const MOCK_AI_INSIGHTS: AIInsight[] = [
     trend: 'up',
     percentage: 32,
   },
+  {
+    id: 'insight-5',
+    type: 'productivity',
+    message: 'Tuesday is your most productive day. Task completion rate peaks mid-week.',
+    trend: 'up',
+    percentage: 15,
+  },
+  {
+    id: 'insight-6',
+    type: 'reading',
+    message: 'Reading speed averaged 1.2 pages/min this month — up 8% from last month.',
+    trend: 'up',
+    percentage: 8,
+  },
 ];
 
 // ── Calendar / Schedule Mock Data ───────────────────────
@@ -976,55 +1097,287 @@ export const MOCK_DAY_SCHEDULES: DaySchedule[] = [
     date: '2024-03-15',
     dayName: 'Friday',
     events: [
-      {
-        id: 'ev-1',
-        title: 'Morning Exercise',
-        time: '06:30',
-        type: 'habit',
-        description: '30 min cardio',
-      },
-      {
-        id: 'ev-2',
-        title: 'Read Atomic Habits Ch 4-5',
-        time: '07:00',
-        type: 'reading',
-      },
-      {
-        id: 'ev-3',
-        title: 'Meditation',
-        time: '07:30',
-        type: 'habit',
-      },
-      {
-        id: 'ev-4',
-        title: 'Team Standup',
-        time: '09:00',
-        type: 'other',
-      },
-      {
-        id: 'ev-5',
-        title: 'Evening Journal',
-        time: '21:00',
-        type: 'journal',
-      },
+      { id: 'ev-1', title: 'Morning Exercise', time: '06:30', type: 'habit', description: '30 min cardio' },
+      { id: 'ev-2', title: 'Read Atomic Habits Ch 4-5', time: '07:00', type: 'reading' },
+      { id: 'ev-3', title: 'Meditation', time: '07:30', type: 'habit' },
+      { id: 'ev-4', title: 'Team Standup', time: '09:00', type: 'other' },
+      { id: 'ev-5', title: 'Evening Journal', time: '21:00', type: 'journal' },
     ],
   },
   {
     date: '2024-03-16',
     dayName: 'Saturday',
     events: [
-      {
-        id: 'ev-6',
-        title: 'Read Pragmatic Programmer',
-        time: '07:00',
-        type: 'reading',
-      },
-      {
-        id: 'ev-7',
-        title: 'Weekly Review',
-        time: '19:00',
-        type: 'goal',
-      },
+      { id: 'ev-6', title: 'Read Pragmatic Programmer', time: '07:00', type: 'reading' },
+      { id: 'ev-7', title: 'Weekly Review', time: '19:00', type: 'goal' },
     ],
   },
+];
+
+// ── Timeline / Living Calendar Data ─────────────────────
+
+export interface TimelineMilestone {
+  id: string;
+  icon: string;
+  label: string;
+  description: string;
+  date: string;
+  achieved: boolean;
+}
+
+export const USER_CREATION_DATE = '2024-01-10';
+
+export const FIRST_EVENT_MILESTONES: TimelineMilestone[] = [
+  { id: 'fe-1', icon: '✅', label: 'First Login', description: 'Logged into KnowledgeOS for the first time', date: '2024-01-10', achieved: true },
+  { id: 'fe-2', icon: '📖', label: 'First Book Added', description: 'Added Atomic Habits to your library', date: '2024-01-10', achieved: true },
+  { id: 'fe-3', icon: '📝', label: 'First Journal', description: 'Wrote your first journal entry', date: '2024-01-11', achieved: true },
+  { id: 'fe-4', icon: '🎯', label: 'First Goal', description: 'Set your first learning goal', date: '2024-01-15', achieved: true },
+  { id: 'fe-5', icon: '📅', label: 'First Calendar Event', description: 'Scheduled your first reading session', date: '2024-01-10', achieved: true },
+  { id: 'fe-6', icon: '🔥', label: 'First Streak', description: 'Reached your first 7-day streak', date: '2024-01-17', achieved: true },
+  { id: 'fe-7', icon: '🧠', label: 'First Knowledge Item', description: 'Created your first note', date: '2024-01-12', achieved: true },
+  { id: 'fe-8', icon: '🤖', label: 'First AI Conversation', description: 'Had your first AI-powered insight session', date: '2024-01-20', achieved: true },
+  { id: 'fe-9', icon: '🏆', label: 'First Weekly Review', description: 'Completed your first weekly review', date: '2024-01-14', achieved: true },
+];
+
+export interface AchievementMilestone {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  achieved: boolean;
+  achievedDate?: string;
+  progress: number;
+}
+
+export const ACHIEVEMENT_MILESTONES: AchievementMilestone[] = [
+  { id: 'ach-1', title: '7-Day Streak', description: 'Maintained a 7-day learning streak', icon: '🔥', achieved: true, achievedDate: '2024-01-17', progress: 100 },
+  { id: 'ach-2', title: '100 Notes', description: 'Created 100 knowledge notes', icon: '📝', achieved: true, achievedDate: '2024-03-05', progress: 100 },
+  { id: 'ach-3', title: '10 Books', description: 'Added 10 books to your library', icon: '📚', achieved: false, progress: 70 },
+  { id: 'ach-4', title: '50 Journal Entries', description: 'Wrote 50 journal reflections', icon: '📓', achieved: false, progress: 48 },
+  { id: 'ach-5', title: 'First Goal Completed', description: 'Completed your first learning goal', icon: '🎯', achieved: true, achievedDate: '2024-04-10', progress: 100 },
+  { id: 'ach-6', title: 'AI Workspace Session', description: 'Had your first AI workspace collaboration', icon: '🤖', achieved: true, achievedDate: '2024-01-20', progress: 100 },
+  { id: 'ach-7', title: '100 Tasks Done', description: 'Completed 100 tasks', icon: '✅', achieved: true, achievedDate: '2024-02-25', progress: 100 },
+  { id: 'ach-8', title: 'Perfect Week', description: 'Completed all habits for 7 days', icon: '⭐', achieved: false, progress: 42 },
+];
+
+export interface DailySummaryData {
+  date: string;
+  tasksCompleted: number;
+  tasksTotal: number;
+  pagesRead: number;
+  readingMinutes: number;
+  journalEntries: number;
+  goalsCompleted: number;
+  habitsCompleted: number;
+  habitsTotal: number;
+  mood: 'great' | 'good' | 'neutral' | 'bad' | 'terrible';
+  focusMinutes: number;
+}
+
+const MOODS: DailySummaryData['mood'][] = ['great', 'good', 'neutral', 'bad', 'terrible'];
+
+export const MOCK_DAILY_SUMMARIES: DailySummaryData[] = Array.from({ length: 90 }, (_, i) => {
+  const d = new Date();
+  d.setDate(d.getDate() - (89 - i));
+  return {
+    date: d.toISOString().split('T')[0]!,
+    tasksCompleted: Math.floor(Math.random() * 7),
+    tasksTotal: 5 + Math.floor(Math.random() * 4),
+    pagesRead: 10 + Math.floor(Math.random() * 50),
+    readingMinutes: 15 + Math.floor(Math.random() * 60),
+    journalEntries: Math.random() > 0.45 ? 1 : 0,
+    goalsCompleted: Math.floor(Math.random() * 2),
+    habitsCompleted: Math.floor(Math.random() * 4) + 1,
+    habitsTotal: 5,
+    mood: MOODS[Math.floor(Math.random() * MOODS.length)]!,
+    focusMinutes: 20 + Math.floor(Math.random() * 120),
+  };
+});
+
+export interface WeeklyReviewData {
+  weekStart: string;
+  weekEnd: string;
+  label: string;
+  readingSummary: string;
+  journalSummary: string;
+  goalProgress: number;
+  habitProgress: number;
+  focusHours: number;
+  knowledgeGrowth: number;
+}
+
+function getWeekBounds(date: Date): { start: Date; end: Date } {
+  const d = new Date(date);
+  const day = d.getDay();
+  d.setDate(d.getDate() - day);
+  const start = new Date(d);
+  const end = new Date(d);
+  end.setDate(end.getDate() + 6);
+  return { start, end };
+}
+
+function formatDate(d: Date): string {
+  return d.toISOString().split('T')[0]!;
+}
+
+export const MOCK_WEEKLY_REVIEWS: WeeklyReviewData[] = Array.from({ length: 8 }, (_, i) => {
+  const d = new Date();
+  d.setDate(d.getDate() - d.getDay() - (7 * (7 - i)));
+  const { start, end } = getWeekBounds(d);
+  return {
+    weekStart: formatDate(start),
+    weekEnd: formatDate(end),
+    label: `${start.toLocaleDateString('en', { month: 'short', day: 'numeric' })} - ${end.toLocaleDateString('en', { month: 'short', day: 'numeric' })}`,
+    readingSummary: ['Deep focus on Atomic Habits', 'Explored system design patterns', 'Read philosophy essays', 'Studied TypeScript advanced types', 'Read psychology of habit formation', 'Analyzed cognitive biases', 'Explored data-intensive patterns', 'Read about distributed systems'][i % 8]!,
+    journalSummary: ['Strong daily reflections', 'Mixed emotions this week', 'Focused on goal tracking', 'Creative writing sessions', 'Deep personal insights', 'Gratitude-focused entries', 'Problem-solving documentation', 'Learning progress logs'][i % 8]!,
+    goalProgress: 30 + Math.floor(Math.random() * 50),
+    habitProgress: 40 + Math.floor(Math.random() * 50),
+    focusHours: 6 + Math.floor(Math.random() * 12),
+    knowledgeGrowth: 5 + Math.floor(Math.random() * 20),
+  };
+});
+
+export interface MonthlyReviewData {
+  month: string;
+  label: string;
+  booksFinished: number;
+  tasksCompleted: number;
+  journalCount: number;
+  studyHours: number;
+  consistency: number;
+  productivityScore: number;
+}
+
+export const MOCK_MONTHLY_REVIEWS: MonthlyReviewData[] = [
+  { month: '2024-01', label: 'January', booksFinished: 1, tasksCompleted: 42, journalCount: 18, studyHours: 28, consistency: 65, productivityScore: 68 },
+  { month: '2024-02', label: 'February', booksFinished: 2, tasksCompleted: 55, journalCount: 22, studyHours: 35, consistency: 72, productivityScore: 74 },
+  { month: '2024-03', label: 'March', booksFinished: 1, tasksCompleted: 48, journalCount: 20, studyHours: 32, consistency: 70, productivityScore: 71 },
+  { month: '2024-04', label: 'April', booksFinished: 2, tasksCompleted: 61, journalCount: 25, studyHours: 40, consistency: 78, productivityScore: 80 },
+  { month: '2024-05', label: 'May', booksFinished: 1, tasksCompleted: 53, journalCount: 19, studyHours: 30, consistency: 68, productivityScore: 70 },
+  { month: '2024-06', label: 'June', booksFinished: 3, tasksCompleted: 67, journalCount: 28, studyHours: 42, consistency: 82, productivityScore: 85 },
+];
+
+export interface YearlyReviewData {
+  year: number;
+  achievements: string[];
+  milestones: { icon: string; label: string; date: string }[];
+  growthTimeline: { month: string; value: number }[];
+}
+
+export const MOCK_YEARLY_REVIEW: YearlyReviewData = {
+  year: 2024,
+  achievements: [
+    'Read 10 books in 6 months',
+    'Completed 326 tasks',
+    'Maintained a 45-day longest streak',
+    'Wrote 132 journal entries',
+    'Created 89 knowledge notes',
+    'Completed 4 learning goals',
+  ],
+  milestones: [
+    { icon: '🎉', label: 'Joined KnowledgeOS', date: 'Jan 10' },
+    { icon: '🔥', label: 'First 7-Day Streak', date: 'Jan 17' },
+    { icon: '📝', label: '100 Notes Created', date: 'Mar 5' },
+    { icon: '🎯', label: 'First Goal Completed', date: 'Apr 10' },
+    { icon: '🤖', label: 'First AI Session', date: 'Jan 20' },
+  ],
+  growthTimeline: [
+    { month: 'Jan', value: 12 },
+    { month: 'Feb', value: 28 },
+    { month: 'Mar', value: 45 },
+    { month: 'Apr', value: 58 },
+    { month: 'May', value: 72 },
+    { month: 'Jun', value: 89 },
+  ],
+};
+
+export interface ProductivityScoreData {
+  overall: number;
+  reading: number;
+  journal: number;
+  tasks: number;
+  goals: number;
+  habits: number;
+  calendar: number;
+}
+
+export const MOCK_PRODUCTIVITY_SCORE: ProductivityScoreData = {
+  overall: 78,
+  reading: 82,
+  journal: 65,
+  tasks: 88,
+  goals: 71,
+  habits: 74,
+  calendar: 69,
+};
+
+export interface TimelineInsight {
+  id: string;
+  message: string;
+  icon: string;
+}
+
+export const MOCK_TIMELINE_INSIGHTS: TimelineInsight[] = [
+  { id: 'ti-1', message: 'You read more on Mondays than any other day.', icon: '📖' },
+  { id: 'ti-2', message: 'Your best focus time is 8 PM – 10 PM.', icon: '⏰' },
+  { id: 'ti-3', message: 'Wednesday is your strongest learning day.', icon: '🧠' },
+  { id: 'ti-4', message: 'Journal entries are 40% longer on weekends.', icon: '📝' },
+  { id: 'ti-5', message: 'Your task completion peaks mid-week.', icon: '✅' },
+  { id: 'ti-6', message: 'Reading consistency drops on Fridays.', icon: '📉' },
+  { id: 'ti-7', message: 'You maintain habits best in the morning.', icon: '🌅' },
+  { id: 'ti-8', message: 'Goal progress accelerates after weekly reviews.', icon: '🎯' },
+];
+
+export interface TimelineEntry {
+  id: string;
+  date: string;
+  time?: string;
+  type: 'study' | 'reading' | 'journal' | 'meeting' | 'goal' | 'habit' | 'task' | 'reminder' | 'milestone' | 'achievement' | 'ai-session';
+  title: string;
+  description?: string;
+  isCompleted?: boolean;
+  badge?: 'today' | 'tomorrow' | 'missed' | 'completed' | 'important' | 'new' | 'upcoming';
+  recurrence?: string;
+  source?: 'google' | 'apple' | 'outlook' | 'local';
+  metadata?: Record<string, string>;
+}
+
+export const MOCK_TIMELINE_ENTRIES: TimelineEntry[] = [
+  ...FIRST_EVENT_MILESTONES.map(fe => ({
+    id: `tl-${fe.id}`,
+    date: fe.date,
+    type: 'milestone' as const,
+    title: fe.label,
+    description: fe.description,
+    isCompleted: true,
+    badge: 'completed' as const,
+  })),
+  { id: 'tl-1', date: '2024-01-10', time: '09:00', type: 'reading', title: 'Started reading Atomic Habits', description: 'Read first 25 pages', isCompleted: true },
+  { id: 'tl-2', date: '2024-01-11', time: '20:00', type: 'journal', title: 'First journal reflection', description: 'Wrote about first day with KnowledgeOS', isCompleted: true },
+  { id: 'tl-3', date: '2024-01-15', time: '10:00', type: 'goal', title: 'Created first goal: Read 24 books in 2024', isCompleted: true },
+  { id: 'tl-4', date: '2024-01-17', time: '07:00', type: 'achievement', title: 'Achieved first 7-day streak!', isCompleted: true },
+  { id: 'tl-5', date: '2024-01-20', time: '14:00', type: 'ai-session', title: 'First AI insight session', description: 'AI suggested productivity patterns', isCompleted: true },
+  { id: 'tl-6', date: '2024-01-21', time: '10:00', type: 'reading', title: 'Finished Atomic Habits', description: 'Completed all 320 pages', isCompleted: true },
+  { id: 'tl-7', date: '2024-02-01', time: '15:00', type: 'reading', title: 'Started The Pragmatic Programmer', description: 'Read first 50 pages', isCompleted: true },
+  { id: 'tl-8', date: '2024-02-05', time: '08:00', type: 'habit', title: 'Created exercise habit', description: 'Daily 30-minute exercise routine', isCompleted: true },
+  { id: 'tl-9', date: '2024-02-14', time: '18:00', type: 'study', title: 'TypeScript deep dive', description: 'Advanced types and generics', isCompleted: true },
+  { id: 'tl-10', date: '2024-02-25', time: '12:00', type: 'achievement', title: 'Completed 100 tasks!', isCompleted: true },
+  { id: 'tl-11', date: '2024-03-01', time: '20:00', type: 'journal', title: 'Monthly reflection: February', description: 'Reviewed progress and adjusted goals', isCompleted: true },
+  { id: 'tl-12', date: '2024-03-05', time: '14:00', type: 'achievement', title: 'Created 100th note!', isCompleted: true },
+  { id: 'tl-13', date: '2024-03-08', time: '09:00', type: 'reading', title: 'Started Thinking, Fast and Slow', isCompleted: true },
+  { id: 'tl-14', date: '2024-03-10', time: '07:00', type: 'habit', title: 'Morning meditation completed', isCompleted: true },
+  { id: 'tl-15', date: '2024-03-12', time: '18:00', type: 'task', title: 'Set up CI/CD pipeline', isCompleted: true },
+  { id: 'tl-16', date: '2024-03-14', time: '10:00', type: 'reading', title: 'Deep Work reading session', description: 'Strategies for focused work', isCompleted: true },
+  { id: 'tl-17', date: '2024-03-15', time: '20:00', type: 'meeting', title: 'Q2 planning session', isCompleted: true },
+  { id: 'tl-18', date: '2024-03-16', time: '19:00', type: 'goal', title: 'Weekly review: goal progress update', isCompleted: true },
+  { id: 'tl-19', date: '2024-03-18', time: '14:00', type: 'task', title: 'Complete project documentation', isCompleted: false, badge: 'missed' },
+  { id: 'tl-20', date: '2024-04-05', time: '11:00', type: 'goal', title: 'Master MERN Stack: 60% complete', description: 'Built 2 full-stack projects', isCompleted: true },
+  { id: 'tl-21', date: '2024-04-10', time: '09:00', type: 'achievement', title: 'First goal completed!', description: 'Ran 5K daily goal achieved', isCompleted: true },
+  { id: 'tl-22', date: '2024-04-15', time: '20:00', type: 'journal', title: 'Spring reflection', description: 'Quarterly review and goal adjustment', isCompleted: true },
+  { id: 'tl-23', date: '2024-05-01', time: '07:00', type: 'habit', title: 'New habit: write 100 words daily', isCompleted: true },
+  { id: 'tl-24', date: '2024-05-10', time: '14:00', type: 'reading', title: 'Started The Psychology of Money', isCompleted: true },
+  { id: 'tl-25', date: '2024-05-20', time: '18:00', type: 'study', title: 'Rust programming basics', description: 'Ownership and borrowing concepts', isCompleted: true },
+  { id: 'tl-26', date: '2024-06-01', time: '12:00', type: 'journal', title: 'Mid-year reflection', description: '6-month progress review', isCompleted: true },
+  { id: 'tl-27', date: '2024-06-10', time: '09:00', type: 'reading', title: 'Started Designing Data-Intensive Applications', isCompleted: true },
+  { id: 'tl-28', date: '2024-06-15', time: '16:00', type: 'ai-session', title: 'AI learning path optimization', description: 'AI suggested optimal study schedule', isCompleted: true },
 ];
