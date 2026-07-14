@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
 import Card from '../../../components/ui/Card';
 
@@ -11,33 +12,54 @@ interface StatCardProps {
     isPositive: boolean;
   };
   color?: 'indigo' | 'green' | 'orange' | 'blue';
+  index?: number;
 }
 
-const StatCard: React.FC<StatCardProps> = ({ label, value, icon: Icon, trend, color = 'indigo' }) => {
-  const colorMap = {
-    indigo: 'text-indigo-600 bg-indigo-50',
-    green: 'text-green-600 bg-green-50',
-    orange: 'text-orange-600 bg-orange-50',
-    blue: 'text-blue-600 bg-blue-50',
-  };
+const colorMap = {
+  indigo: {
+    icon: 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10',
+    ring: 'ring-indigo-500/10',
+  },
+  green: {
+    icon: 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10',
+    ring: 'ring-emerald-500/10',
+  },
+  orange: {
+    icon: 'text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-500/10',
+    ring: 'ring-orange-500/10',
+  },
+  blue: {
+    icon: 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10',
+    ring: 'ring-blue-500/10',
+  },
+};
+
+const StatCard: React.FC<StatCardProps> = ({ label, value, icon: Icon, trend, color = 'indigo', index = 0 }) => {
+  const colors = colorMap[color];
 
   return (
-    <Card className="flex flex-col gap-3 md:gap-4">
-      <div className="flex items-center justify-between">
-        <div className={`p-2 rounded-lg ${colorMap[color]}`}>
-          <Icon size={18} />
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: index * 0.05, ease: [0.16, 1, 0.3, 1] }}
+    >
+      <Card className="flex flex-col gap-3 md:gap-4">
+        <div className="flex items-center justify-between">
+          <div className={`p-2.5 rounded-xl ring-1 ${colors.icon} ${colors.ring}`}>
+            <Icon size={17} strokeWidth={2} />
+          </div>
+          {trend && (
+            <span className={`text-[10px] md:text-xs font-semibold ${trend.isPositive ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>
+              {trend.isPositive ? '+' : ''} {trend.value}
+            </span>
+          )}
         </div>
-        {trend && (
-          <span className={`text-[10px] md:text-xs font-medium ${trend.isPositive ? 'text-green-600' : 'text-red-600'}`}>
-            {trend.isPositive ? '↑' : '↓'} {trend.value}
-          </span>
-        )}
-      </div>
-      <div>
-        <p className="text-xs md:text-sm text-gray-500 font-medium">{label}</p>
-        <p className="text-xl md:text-2xl font-bold text-gray-900 leading-tight">{value}</p>
-      </div>
-    </Card>
+        <div>
+          <p className="text-xs md:text-[13px] text-slate-500 dark:text-slate-400 font-medium">{label}</p>
+          <p className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white leading-tight mt-0.5">{value}</p>
+        </div>
+      </Card>
+    </motion.div>
   );
 };
 

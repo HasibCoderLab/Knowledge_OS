@@ -18,8 +18,11 @@ import type {
 
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
-// Mutable state for notes CRUD
+// Mutable state for CRUD
 let notesData: Note[] = MOCK_NOTES.map((n) => ({ ...n, tags: [...n.tags] }));
+let goalsData: Goal[] = MOCK_GOALS.map((g) => ({ ...g }));
+let habitsData: Habit[] = MOCK_HABITS.map((h) => ({ ...h, logs: [...h.logs] }));
+let tasksData: Task[] = MOCK_TASKS.map((t) => ({ ...t }));
 
 export const mockApi = {
   // User
@@ -111,44 +114,130 @@ export const mockApi = {
     return { success: true, data: note };
   },
 
-  // Habits
+  // Habits (mutable state for CRUD)
   async getHabits(): Promise<ApiResponse<Habit[]>> {
     await sleep(600);
-    return { success: true, data: MOCK_HABITS };
+    return { success: true, data: habitsData };
   },
 
   async getHabitStats(): Promise<ApiResponse<{ totalCompletions: number; currentStreak: number; longestStreak: number }>> {
     await sleep(500);
-    const totalCompletions = MOCK_HABITS.reduce((sum, h) => sum + h.logs.filter(l => l.completed).length, 0);
+    const totalCompletions = habitsData.reduce((sum, h) => sum + h.logs.filter(l => l.completed).length, 0);
     return {
       success: true,
       data: {
         totalCompletions,
-        currentStreak: Math.max(...MOCK_HABITS.map(h => h.streak)),
-        longestStreak: Math.max(...MOCK_HABITS.map(h => h.streak)),
+        currentStreak: Math.max(...habitsData.map(h => h.streak)),
+        longestStreak: Math.max(...habitsData.map(h => h.streak)),
       },
     };
   },
 
-  // Goals
-  async getGoals(): Promise<ApiResponse<Goal[]>> {
-    await sleep(700);
-    return { success: true, data: MOCK_GOALS };
+  async createHabit(habit: Omit<Habit, 'id' | 'createdAt' | 'logs' | 'streak' | 'completedToday'>): Promise<ApiResponse<Habit>> {
+    await sleep(500);
+    const newHabit: Habit = {
+      ...habit,
+      id: `habit-${Date.now()}`,
+      streak: 0,
+      completedToday: false,
+      logs: [],
+      createdAt: new Date().toISOString().split('T')[0]!,
+    };
+    habitsData = [newHabit, ...habitsData];
+    return { success: true, data: newHabit };
   },
 
-  // Tasks
+  async updateHabit(id: string, updates: Partial<Habit>): Promise<ApiResponse<Habit | undefined>> {
+    await sleep(400);
+    const index = habitsData.findIndex((h) => h.id === id);
+    if (index === -1) return { success: true, data: undefined };
+    habitsData[index] = { ...habitsData[index]!, ...updates, id };
+    return { success: true, data: habitsData[index] };
+  },
+
+  async deleteHabit(id: string): Promise<ApiResponse<null>> {
+    await sleep(300);
+    habitsData = habitsData.filter((h) => h.id !== id);
+    return { success: true, data: null };
+  },
+
+  async toggleHabitCompletion(id: string): Promise<ApiResponse<Habit | undefined>> {
+    await sleep(200);
+    const habit = habitsData.find((h) => h.id === id);
+    if (!habit) return { success: true, data: undefined };
+    const today = new Date().toISOString().split('T')[0]!;
+    const existing = habit.logs.find((l) => l.date === today);
+    if (existing) {
+      existing.completed = !existing.completed;
+      habit.completedToday = existing.completed;
+    } else {
+      habit.logs.push({ date: today, completed: true });
+      habit.completedToday = true;
+    }
+    habit.streak = habit.completedToday ? habit.streak + 1 : Math.max(0, habit.streak - 1);
+    return { success: true, data: habit };
+  },
+
+  // Goals (mutable state for CRUD)
+  async getGoals(): Promise<ApiResponse<Goal[]>> {
+    await sleep(700);
+    return { success: true, data: goalsData };
+  },
+
+  async createGoal(goal: Omit<Goal, 'id' | 'createdAt'>): Promise<ApiResponse<Goal>> {
+    await sleep(500);
+    const newGoal: Goal = {
+      ...goal,
+      id: `goal-${Date.now()}`,
+      createdAt: new Date().toISOString().split('T')[0]!,
+    };
+    goalsData = [newGoal, ...goalsData];
+    return { success: true, data: newGoal };
+  },
+
+  async updateGoal(id: string, updates: Partial<Goal>): Promise<ApiResponse<Goal | undefined>> {
+    await sleep(400);
+    const index = goalsData.findIndex((g) => g.id === id);
+    if (index === -1) return { success: true, data: undefined };
+    goalsData[index] = { ...goalsData[index]!, ...updates, id };
+    return { success: true, data: goalsData[index] };
+  },
+
+  async deleteGoal(id: string): Promise<ApiResponse<null>> {
+    await sleep(300);
+    goalsData = goalsData.filter((g) => g.id !== id);
+    return { success: true, data: null };
+  },
+
+  // Tasks (mutable state for CRUD)
   async getTasks(): Promise<ApiResponse<Task[]>> {
     await sleep(500);
-    return { success: true, data: MOCK_TASKS };
+    return { success: true, data: tasksData };
+  },
+
+  async createTask(task: Omit<Task, 'id' | 'createdAt'>): Promise<ApiResponse<Task>> {
+    await sleep(500);
+    const newTask: Task = {
+      ...task,
+      id: `task-${Date.now()}`,
+      createdAt: new Date().toISOString().split('T')[0]!,
+    };
+    tasksData = [newTask, ...tasksData];
+    return { success: true, data: newTask };
   },
 
   async updateTask(id: string, updates: Partial<Task>): Promise<ApiResponse<Task | undefined>> {
     await sleep(300);
-    const task = MOCK_TASKS.find((t) => t.id === id);
-    if (task) {
-      Object.assign(task, updates);
-    }
-    return { success: true, data: task };
+    const index = tasksData.findIndex((t) => t.id === id);
+    if (index === -1) return { success: true, data: undefined };
+    tasksData[index] = { ...tasksData[index]!, ...updates, id };
+    return { success: true, data: tasksData[index] };
+  },
+
+  async deleteTask(id: string): Promise<ApiResponse<null>> {
+    await sleep(300);
+    tasksData = tasksData.filter((t) => t.id !== id);
+    return { success: true, data: null };
   },
 
   // Journal

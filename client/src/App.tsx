@@ -3,7 +3,9 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import MainLayout from './layouts/MainLayout';
 import ToastContainer from './components/ui/Toast';
+import ScrollToTop from './components/layout/ScrollToTop';
 
+const LandingPage = lazy(() => import('./pages/landing/LandingPage'));
 const Dashboard = lazy(() => import('./pages/dashboard/Dashboard').then(m => ({ default: m.Dashboard })));
 const Library = lazy(() => import('./pages/library/Library').then(m => ({ default: m.Library })));
 const Notes = lazy(() => import('./pages/notes/Notes').then(m => ({ default: m.Notes })));
@@ -41,6 +43,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+        <ScrollToTop />
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route element={<MainLayout />}>
@@ -58,9 +61,9 @@ function App() {
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/search" element={<Search />} />
               <Route path="/notifications" element={<Notifications />} />
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
             </Route>
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/" element={<LandingPage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
       </BrowserRouter>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { Pin, Star, Edit3, Trash2, MoreHorizontal, Calendar } from 'lucide-react';
 import Dropdown from '../../../components/ui/Dropdown';
 import type { Note } from '../../../types';
@@ -17,12 +18,16 @@ const NoteCard: React.FC<NoteCardProps> = ({ note, onEdit, onDelete, onTogglePin
     : note.content;
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+      whileHover={{ y: -3 }}
       className={`
-        group flex flex-col bg-white dark:bg-slate-900 border rounded-2xl transition-all hover:shadow-md h-full
+        group flex flex-col bg-white dark:bg-slate-900 border rounded-2xl transition-all duration-200 h-full
         ${note.isPinned
-          ? 'border-indigo-200 dark:border-indigo-800 ring-1 ring-indigo-100 dark:ring-indigo-900'
-          : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
+          ? 'border-indigo-200 dark:border-indigo-800/60 ring-1 ring-indigo-100 dark:ring-indigo-900/50 shadow-sm shadow-indigo-500/5'
+          : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-lg hover:shadow-slate-900/5 dark:hover:shadow-slate-900/20'
         }
       `}
     >
@@ -32,7 +37,7 @@ const NoteCard: React.FC<NoteCardProps> = ({ note, onEdit, onDelete, onTogglePin
             {note.title}
           </h3>
           <Dropdown
-            trigger={<MoreHorizontal size={15} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 shrink-0" />}
+            trigger={<MoreHorizontal size={15} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />}
             align="right"
             items={[
               { label: 'Edit', icon: <Edit3 size={14} />, onClick: () => onEdit(note) },
@@ -60,8 +65,8 @@ const NoteCard: React.FC<NoteCardProps> = ({ note, onEdit, onDelete, onTogglePin
           </div>
         )}
 
-        <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800">
-          <span className="flex items-center gap-1.5 text-[11px] text-slate-400">
+        <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800/80">
+          <span className="flex items-center gap-1.5 text-[11px] text-slate-400 dark:text-slate-500">
             <Calendar size={11} />
             {note.createdAt}
           </span>
@@ -73,13 +78,13 @@ const NoteCard: React.FC<NoteCardProps> = ({ note, onEdit, onDelete, onTogglePin
       </div>
 
       {note.bookId && note.bookTitle && (
-        <div className="px-5 py-2 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800">
-          <p className="text-[10px] text-slate-400 truncate">
+        <div className="px-5 py-2.5 bg-slate-50 dark:bg-slate-800/40 border-t border-slate-100 dark:border-slate-800/80">
+          <p className="text-[10px] text-slate-400 dark:text-slate-500 truncate font-medium">
             From: {note.bookTitle}
           </p>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 };
 

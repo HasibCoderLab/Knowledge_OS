@@ -34,7 +34,7 @@ function Table<T extends Record<string, unknown>>({
         {Array.from({ length: 5 }).map((_, i) => (
           <div key={i} className="flex items-center gap-4 p-3">
             {columns.map((col, ci) => (
-              <Skeleton key={ci} className="h-4 flex-1" />
+              <Skeleton key={ci} className="h-4 flex-1 rounded-lg" />
             ))}
           </div>
         ))}
@@ -58,7 +58,7 @@ function Table<T extends Record<string, unknown>>({
             {columns.map((col) => (
               <th
                 key={String(col.key)}
-                className={`text-left px-3 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider ${col.className ?? ''}`}
+                className={`text-left px-3 py-3 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider ${col.className ?? ''}`}
               >
                 {col.header}
               </th>
@@ -73,7 +73,7 @@ function Table<T extends Record<string, unknown>>({
               className={`
                 border-b border-slate-100 dark:border-slate-800/50
                 ${onRowClick ? 'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/30' : ''}
-                transition-colors
+                transition-colors duration-150
               `}
             >
               {columns.map((col) => (

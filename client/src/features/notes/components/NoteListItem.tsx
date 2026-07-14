@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { Pin, Star, Edit3, Trash2, MoreHorizontal, Calendar, FileText } from 'lucide-react';
 import Dropdown from '../../../components/ui/Dropdown';
 import type { Note } from '../../../types';
@@ -17,17 +18,20 @@ const NoteListItem: React.FC<NoteListItemProps> = ({ note, onEdit, onDelete, onT
     : note.content;
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
       className={`
-        flex items-start gap-4 p-4 bg-white dark:bg-slate-900 border rounded-xl transition-all hover:shadow-sm
+        flex items-start gap-4 p-4 bg-white dark:bg-slate-900 border rounded-xl transition-all duration-200
         ${note.isPinned
-          ? 'border-indigo-200 dark:border-indigo-800'
-          : 'border-slate-200 dark:border-slate-800'
+          ? 'border-indigo-200 dark:border-indigo-800/60 ring-1 ring-indigo-100 dark:ring-indigo-900/50'
+          : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-md hover:shadow-slate-900/5 dark:hover:shadow-slate-900/20'
         }
       `}
     >
-      <div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 shrink-0">
-        <FileText size={15} className="text-slate-500 dark:text-slate-400" />
+      <div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800/60 shrink-0">
+        <FileText size={15} className="text-slate-500 dark:text-slate-400" strokeWidth={1.75} />
       </div>
 
       <div className="flex-1 min-w-0">
@@ -45,10 +49,10 @@ const NoteListItem: React.FC<NoteListItemProps> = ({ note, onEdit, onDelete, onT
             </p>
           </div>
 
-          <div className="flex items-center gap-1 shrink-0">
+          <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
               onClick={() => onTogglePin(note)}
-              className={`p-1.5 rounded-lg transition-colors ${
+              className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
                 note.isPinned
                   ? 'text-indigo-500 bg-indigo-50 dark:bg-indigo-900/20'
                   : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:text-slate-300 dark:hover:bg-slate-800'
@@ -59,7 +63,7 @@ const NoteListItem: React.FC<NoteListItemProps> = ({ note, onEdit, onDelete, onT
             </button>
             <button
               onClick={() => onToggleFavorite(note)}
-              className={`p-1.5 rounded-lg transition-colors ${
+              className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
                 note.isFavorite
                   ? 'text-amber-500 bg-amber-50 dark:bg-amber-900/20'
                   : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:text-slate-300 dark:hover:bg-slate-800'
@@ -92,13 +96,13 @@ const NoteListItem: React.FC<NoteListItemProps> = ({ note, onEdit, onDelete, onT
               ))}
             </div>
           )}
-          <span className="flex items-center gap-1 text-[10px] text-slate-400 ml-auto">
+          <span className="flex items-center gap-1 text-[10px] text-slate-400 dark:text-slate-500 ml-auto">
             <Calendar size={10} />
             {note.createdAt}
           </span>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

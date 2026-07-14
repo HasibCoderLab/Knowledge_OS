@@ -25,14 +25,14 @@ const Avatar: React.FC<AvatarProps> = ({ src, alt = '', name, size = 'md', class
       <img
         src={src}
         alt={alt || name || 'Avatar'}
-        className={`${sizeMap[size]} rounded-full object-cover shrink-0 ${className}`}
+        className={`${sizeMap[size]} rounded-full object-cover shrink-0 ring-2 ring-white dark:ring-slate-900 ${className}`}
       />
     );
   }
 
   return (
     <div
-      className={`${sizeMap[size]} rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold shrink-0 ${className}`}
+      className={`${sizeMap[size]} rounded-full bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center text-white font-bold shrink-0 ring-2 ring-white dark:ring-slate-900 ${className}`}
       aria-label={alt || name || 'Avatar'}
     >
       {initials}

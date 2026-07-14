@@ -10,118 +10,137 @@ import Button from '../../components/ui/Button';
 import Badge from '../../components/ui/Badge';
 
 export const Dashboard: React.FC = () => {
-  const { data: books, isLoading: booksLoading } = useQuery({ 
-    queryKey: ['books'], 
-    queryFn: mockApi.getBooks 
+  const { data: books, isLoading: booksLoading } = useQuery({
+    queryKey: ['books'],
+    queryFn: mockApi.getBooks,
   });
-  const { data: habits, isLoading: habitsLoading } = useQuery({ 
-    queryKey: ['habits'], 
-    queryFn: mockApi.getHabits 
+  const { data: habits, isLoading: habitsLoading } = useQuery({
+    queryKey: ['habits'],
+    queryFn: mockApi.getHabits,
   });
-  const { data: goals, isLoading: goalsLoading } = useQuery({ 
-    queryKey: ['goals'], 
-    queryFn: mockApi.getGoals 
+  const { data: goals, isLoading: goalsLoading } = useQuery({
+    queryKey: ['goals'],
+    queryFn: mockApi.getGoals,
   });
 
   if (booksLoading || habitsLoading || goalsLoading) {
     return (
       <div className="flex items-center justify-center min-h-[80vh]">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm text-slate-500 animate-pulse">Loading your OS...</p>
+          <div className="w-8 h-8 border-[3px] border-indigo-600 border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm text-slate-500 dark:text-slate-400 animate-pulse">Loading your OS...</p>
         </div>
       </div>
     );
   }
 
-  const currentBook = books?.data?.find(b => b.status === 'reading') || books?.data?.[0];
+  const currentBook = books?.data?.find((b) => b.status === 'reading') || books?.data?.[0];
 
   return (
     <div className="space-y-6 md:space-y-8 lg:space-y-10">
-      {/* Header Section */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
+      {/* Header */}
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6">
         <div>
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">Dashboard</h2>
-          <p className="text-sm md:text-base text-slate-500 dark:text-slate-400 mt-1">Welcome back, John. Here's your growth summary.</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+            Dashboard
+          </h2>
+          <p className="text-sm md:text-[15px] text-slate-500 dark:text-slate-400 mt-1">
+            Welcome back, John. Here's your growth summary.
+          </p>
         </div>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
-          <Button variant="outline" size="sm" className="flex items-center justify-center gap-2">
+          <Button variant="outline" size="sm" className="gap-2">
             <Zap size={14} /> Quick Action
           </Button>
-          <Button variant="primary" size="sm" className="flex items-center justify-center gap-2">
+          <Button variant="primary" size="sm" className="gap-2">
             <Plus size={14} /> New Entry
           </Button>
         </div>
       </header>
 
-      {/* Top Row: High Level Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard 
-          label="Books Read" 
-          value="14" 
-          icon={BookOpen} 
-          color="indigo" 
-          trend={{ value: '+2 this month', isPositive: true }} 
+      {/* Stats Row */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+        <StatCard
+          label="Books Read"
+          value="14"
+          icon={BookOpen}
+          color="indigo"
+          trend={{ value: '+2 this month', isPositive: true }}
+          index={0}
         />
-        <StatCard 
-          label="Active Goals" 
-          value={goals?.data?.length || 0} 
-          icon={Target} 
-          color="blue" 
+        <StatCard
+          label="Active Goals"
+          value={goals?.data?.length || 0}
+          icon={Target}
+          color="blue"
+          index={1}
         />
-        <StatCard 
-          label="Habit Completion" 
-          value="85%" 
-          icon={Zap} 
-          color="green" 
-          trend={{ value: '+5% vs last week', isPositive: true }} 
+        <StatCard
+          label="Habit Completion"
+          value="85%"
+          icon={Zap}
+          color="green"
+          trend={{ value: '+5% vs last week', isPositive: true }}
+          index={2}
         />
-        <StatCard 
-          label="New Vocabulary" 
-          value="124" 
-          icon={Flame} 
-          color="orange" 
+        <StatCard
+          label="New Vocabulary"
+          value="124"
+          icon={Flame}
+          color="orange"
+          index={3}
         />
       </div>
 
-      {/* Middle Section: Bento Grid */}
+      {/* Bento Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
-        
-        {/* Main Focus: Reading Progress (Span 8) */}
+        {/* Main Column */}
         <div className="lg:col-span-8 space-y-8">
+          {/* Reading Progress */}
           <section>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <BookOpen size={20} className="text-indigo-600" />
+              <h3 className="text-base font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                <BookOpen size={18} className="text-indigo-500" strokeWidth={2} />
                 Current Focus
               </h3>
-              <Button variant="ghost" size="sm" className="text-xs">View Library <ArrowUpRight size={12} /></Button>
+              <Button variant="ghost" size="sm" className="text-xs gap-1">
+                View Library <ArrowUpRight size={12} />
+              </Button>
             </div>
             <ReadingProgressCard book={currentBook} />
           </section>
 
+          {/* Goals */}
           <section>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <Target size={20} className="text-indigo-600" />
+              <h3 className="text-base font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                <Target size={18} className="text-indigo-500" strokeWidth={2} />
                 Strategic Goals
               </h3>
-              <Button variant="ghost" size="sm" className="text-xs">Manage Goals <ArrowUpRight size={12} /></Button>
+              <Button variant="ghost" size="sm" className="text-xs gap-1">
+                Manage Goals <ArrowUpRight size={12} />
+              </Button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {goals?.data?.map(goal => (
-                <Card key={goal.id} className="p-4 group cursor-pointer hover:border-indigo-200 transition-colors">
+              {goals?.data?.map((goal) => (
+                <Card key={goal.id} hoverable className="p-4 group">
                   <div className="flex justify-between items-start mb-3">
-                    <div className="flex items-center gap-2">
-                      <Badge variant={goal.priority === 'high' ? 'danger' : 'info'}>{goal.priority}</Badge>
-                      <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{goal.title}</span>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <Badge variant={goal.priority === 'high' ? 'danger' : goal.priority === 'medium' ? 'warning' : 'info'}>
+                        {goal.priority}
+                      </Badge>
+                      <span className="text-sm font-semibold text-slate-700 dark:text-slate-200 truncate">
+                        {goal.title}
+                      </span>
                     </div>
-                    <span className="text-xs font-bold text-indigo-600">{goal.progress}%</span>
+                    <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 shrink-0 ml-2">
+                      {goal.progress}%
+                    </span>
                   </div>
                   <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-indigo-500 transition-all duration-700 group-hover:bg-indigo-400" 
-                      style={{ width: `${goal.progress}%` }} 
+                    <div
+                      className="h-full bg-gradient-to-r from-indigo-500 to-indigo-400 rounded-full transition-all duration-700 ease-out group-hover:from-indigo-400 group-hover:to-indigo-300"
+                      style={{ width: `${goal.progress}%` }}
                     />
                   </div>
                 </Card>
@@ -130,43 +149,62 @@ export const Dashboard: React.FC = () => {
           </section>
         </div>
 
-        {/* Sidebar: Habits & Quick Actions (Span 4) */}
-        <div className="lg:col-span-4 space-y-8">
+        {/* Sidebar Column */}
+        <div className="lg:col-span-4 space-y-6">
           <HabitChecklist habits={habits?.data || []} />
-          
-          <Card title="Quick Actions" subtitle="Rapid entry for your OS">
-            <div className="grid grid-cols-1 gap-3">
-              <Button variant="secondary" className="justify-start gap-3 text-left">
-                <BookOpen size={16} /> Add New Book
-              </Button>
-              <Button variant="secondary" className="justify-start gap-3 text-left">
-                <FileText size={16} /> Create New Note
-              </Button>
-              <Button variant="secondary" className="justify-start gap-3 text-left">
-                <Target size={16} /> Set New Goal
-              </Button>
+
+          {/* Quick Actions */}
+          <Card>
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-1">Quick Actions</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">Rapid entry for your OS</p>
+            <div className="grid grid-cols-1 gap-2.5">
+              <button className="flex items-center gap-3 px-3.5 py-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-medium text-slate-700 dark:text-slate-300 transition-all duration-200 cursor-pointer group border border-slate-100 dark:border-slate-800">
+                <div className="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 group-hover:scale-105 transition-transform">
+                  <BookOpen size={15} strokeWidth={2} />
+                </div>
+                Add New Book
+              </button>
+              <button className="flex items-center gap-3 px-3.5 py-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-medium text-slate-700 dark:text-slate-300 transition-all duration-200 cursor-pointer group border border-slate-100 dark:border-slate-800">
+                <div className="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 group-hover:scale-105 transition-transform">
+                  <FileText size={15} strokeWidth={2} />
+                </div>
+                Create New Note
+              </button>
+              <button className="flex items-center gap-3 px-3.5 py-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-medium text-slate-700 dark:text-slate-300 transition-all duration-200 cursor-pointer group border border-slate-100 dark:border-slate-800">
+                <div className="p-1.5 rounded-lg bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 group-hover:scale-105 transition-transform">
+                  <Target size={15} strokeWidth={2} />
+                </div>
+                Set New Goal
+              </button>
             </div>
           </Card>
 
-          <div className="p-4 md:p-6 bg-indigo-600 rounded-2xl text-white shadow-xl shadow-indigo-500/20 relative overflow-hidden group">
+          {/* Pro Tip */}
+          <div className="p-5 md:p-6 bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-2xl text-white shadow-xl shadow-indigo-500/20 relative overflow-hidden group">
             <div className="relative z-10">
-              <h4 className="text-base md:text-lg font-bold mb-2 flex items-center gap-2">
-                <Lightbulb size={18} className="text-yellow-300 shrink-0" />
+              <h4 className="text-base font-bold mb-2.5 flex items-center gap-2">
+                <Lightbulb size={17} className="text-yellow-300 shrink-0" />
                 Pro Tip
               </h4>
-              <p className="text-indigo-100 text-xs md:text-sm leading-relaxed mb-4">
+              <p className="text-indigo-100 text-sm leading-relaxed mb-5">
                 "Reading a book is a conversation. Take notes to talk back to the author."
               </p>
-              <Button variant="outline" size="sm" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30"
+              >
                 Explore Tips
               </Button>
             </div>
-            <Zap className="absolute -right-4 -bottom-4 text-white/10 group-hover:scale-110 transition-transform" size={80} />
+            <Zap
+              className="absolute -right-6 -bottom-6 text-white/[0.07] group-hover:scale-110 group-hover:rotate-12 transition-all duration-500"
+              size={90}
+              strokeWidth={1}
+            />
           </div>
         </div>
       </div>
     </div>
   );
 };
-
-

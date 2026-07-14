@@ -1,4 +1,5 @@
 import React from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from 'lucide-react';
 import { useToastStore } from '../../store/toastStore';
 
@@ -16,6 +17,22 @@ const colorMap = {
   info: 'bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-300',
 };
 
+const toastVariants = {
+  initial: { opacity: 0, y: 20, scale: 0.95 },
+  animate: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.3, ease: [0.16, 1, 0.3, 1] },
+  },
+  exit: {
+    opacity: 0,
+    y: -10,
+    scale: 0.95,
+    transition: { duration: 0.2, ease: 'easeIn' },
+  },
+};
+
 const ToastContainer: React.FC = () => {
   const { toasts, removeToast } = useToastStore();
 
@@ -23,32 +40,38 @@ const ToastContainer: React.FC = () => {
 
   return (
     <div className="fixed bottom-4 right-4 z-[60] flex flex-col gap-2 max-w-sm w-full">
-      {toasts.map((toast) => {
-        const Icon = iconMap[toast.type as keyof typeof iconMap];
-        const colorClass = colorMap[toast.type as keyof typeof colorMap];
-        return (
-          <div
-            key={toast.id}
-            className={`flex items-start gap-3 px-4 py-3 rounded-xl border shadow-lg animate-slide-up ${colorClass}`}
-            role="alert"
-          >
-            <Icon size={18} className="shrink-0 mt-0.5" />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold">{toast.title}</p>
-              {toast.description && (
-                <p className="text-xs mt-0.5 opacity-80">{toast.description}</p>
-              )}
-            </div>
-            <button
-              onClick={() => removeToast(toast.id)}
-              className="shrink-0 p-0.5 rounded hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
-              aria-label="Dismiss"
+      <AnimatePresence>
+        {toasts.map((toast) => {
+          const Icon = iconMap[toast.type as keyof typeof iconMap];
+          const colorClass = colorMap[toast.type as keyof typeof colorMap];
+          return (
+            <motion.div
+              key={toast.id}
+              variants={toastVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className={`flex items-start gap-3 px-4 py-3.5 rounded-xl border shadow-lg ${colorClass}`}
+              role="alert"
             >
-              <X size={14} />
-            </button>
-          </div>
-        );
-      })}
+              <Icon size={18} className="shrink-0 mt-0.5" strokeWidth={2} />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold">{toast.title}</p>
+                {toast.description && (
+                  <p className="text-xs mt-0.5 opacity-80">{toast.description}</p>
+                )}
+              </div>
+              <button
+                onClick={() => removeToast(toast.id)}
+                className="shrink-0 p-0.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer"
+                aria-label="Dismiss"
+              >
+                <X size={14} />
+              </button>
+            </motion.div>
+          );
+        })}
+      </AnimatePresence>
     </div>
   );
 };
