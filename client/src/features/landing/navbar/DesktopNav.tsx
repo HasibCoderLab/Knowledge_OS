@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 import { navItems } from './constants';
@@ -12,19 +13,38 @@ interface DesktopNavProps {
 
 const DesktopNav: React.FC<DesktopNavProps> = ({ activeSection, onClick }) => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
+
   return (
     <nav className="hidden lg:flex items-center gap-1" aria-label="Main navigation">
       {navItems.map((item) => {
         const isActive = !item.external && activeSection === item.href;
+        if (item.external) {
+          return (
+            <a
+              key={item.labelKey}
+              href={item.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="relative px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 group text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+            >
+              <span className="relative">
+                {t(item.labelKey)}
+                <ArrowUpRight
+                  size={12}
+                  className="inline-block ml-0.5 -mt-0.5 opacity-40 group-hover:opacity-70 transition-opacity"
+                />
+              </span>
+            </a>
+          );
+        }
         return (
-          <a
+          <button
             key={item.labelKey}
-            href={item.href}
-            target={item.external ? '_blank' : undefined}
-            rel={item.external ? 'noopener noreferrer' : undefined}
-            onClick={(e) => {
-              if (!item.external) {
-                e.preventDefault();
+            onClick={() => {
+              if (item.href.startsWith('/')) {
+                navigate(item.href);
+              } else {
                 onClick(item);
               }
             }}
@@ -36,12 +56,6 @@ const DesktopNav: React.FC<DesktopNavProps> = ({ activeSection, onClick }) => {
           >
             <span className="relative">
               {t(item.labelKey)}
-              {item.external && (
-                <ArrowUpRight
-                  size={12}
-                  className="inline-block ml-0.5 -mt-0.5 opacity-40 group-hover:opacity-70 transition-opacity"
-                />
-              )}
               {!item.external && (
                 <motion.span
                   className="absolute -bottom-px left-0 right-0 h-px bg-indigo-600 dark:bg-indigo-400"
@@ -52,7 +66,7 @@ const DesktopNav: React.FC<DesktopNavProps> = ({ activeSection, onClick }) => {
                 />
               )}
             </span>
-          </a>
+          </button>
         );
       })}
     </nav>

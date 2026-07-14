@@ -30,14 +30,24 @@ export interface LanguageContextValue {
 
 export const LanguageContext = createContext<LanguageContextValue | null>(null);
 
+const cache = new Map<string, string>();
+
 function resolveNested(obj: Record<string, unknown>, path: string): string {
+  const cached = cache.get(path);
+  if (cached) return cached;
+
   const parts = path.split('.');
   let current: unknown = obj;
   for (const part of parts) {
-    if (current === null || current === undefined) return path;
+    if (current === null || current === undefined) {
+      cache.set(path, path);
+      return path;
+    }
     current = (current as Record<string, unknown>)[part];
   }
-  return typeof current === 'string' ? current : path;
+  const result = typeof current === 'string' ? current : path;
+  cache.set(path, result);
+  return result;
 }
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -47,6 +57,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   useEffect(() => {
     translationsRef.current = getTranslations(locale);
     document.documentElement.lang = locale;
+    cache.clear();
   }, [locale]);
 
   const setLocale = useCallback((newLocale: SupportedLocale) => {
@@ -54,6 +65,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     try {
       localStorage.setItem(STORAGE_KEY, newLocale);
     } catch {}
+    cache.clear();
   }, []);
 
   const t = useCallback((path: string): string => {

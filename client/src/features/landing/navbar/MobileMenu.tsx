@@ -1,4 +1,5 @@
 import React, { useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ArrowUpRight, BrainCircuit } from 'lucide-react';
 import { navItems } from './constants';
@@ -14,6 +15,8 @@ interface MobileMenuProps {
 
 const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavClick }) => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
+
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -34,11 +37,20 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavClick }) 
     };
   }, [isOpen, handleKeyDown]);
 
+  const handleNavItem = (item: NavItem) => {
+    if (item.external) return;
+    if (item.href.startsWith('/')) {
+      navigate(item.href);
+    } else {
+      onNavClick(item);
+    }
+    onClose();
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -49,7 +61,6 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavClick }) 
             aria-hidden="true"
           />
 
-          {/* Drawer */}
           <motion.div
             initial={{ opacity: 0, x: '100%' }}
             animate={{ opacity: 1, x: 0 }}
@@ -61,7 +72,6 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavClick }) 
             aria-label={t('mobileMenu.label')}
           >
             <div className="flex flex-col h-full">
-              {/* Header */}
               <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200 dark:border-slate-800">
                 <div className="flex items-center gap-2">
                   <BrainCircuit className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
@@ -77,7 +87,6 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavClick }) 
                 </button>
               </div>
 
-              {/* Links */}
               <nav className="flex-1 overflow-y-auto px-3 py-5" aria-label={t('mobileMenu.label')}>
                 <ul className="space-y-1" role="list">
                   {navItems.map((item, i) => (
@@ -87,31 +96,32 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavClick }) 
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ duration: 0.3, delay: 0.05 + i * 0.04, ease: 'easeOut' as const }}
                     >
-                      <a
-                        href={item.href}
-                        target={item.external ? '_blank' : undefined}
-                        rel={item.external ? 'noopener noreferrer' : undefined}
-                        onClick={(e) => {
-                          if (!item.external) {
-                            e.preventDefault();
-                            onNavClick(item);
-                          }
-                          onClose();
-                        }}
-                        className="flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-900 transition-all duration-200"
-                      >
-                        {t(item.labelKey)}
-                        {item.external && <ArrowUpRight size={14} className="text-slate-400 shrink-0" />}
-                      </a>
+                      {item.external ? (
+                        <a
+                          href={item.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={onClose}
+                          className="flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-900 transition-all duration-200"
+                        >
+                          {t(item.labelKey)}
+                          <ArrowUpRight size={14} className="text-slate-400 shrink-0" />
+                        </a>
+                      ) : (
+                        <button
+                          onClick={() => handleNavItem(item)}
+                          className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-900 transition-all duration-200 text-left"
+                        >
+                          {t(item.labelKey)}
+                        </button>
+                      )}
                     </motion.li>
                   ))}
                 </ul>
               </nav>
 
-              {/* Language Switcher - Mobile */}
               <LanguageSwitcher variant="mobile" onClose={onClose} />
 
-              {/* Footer */}
               <div className="px-5 py-4 border-t border-slate-200 dark:border-slate-800">
                 <a
                   href="/auth/login"
