@@ -11,8 +11,7 @@ import PhilosophySection from '../../features/landing/PhilosophySection';
 import WhySection from '../../features/landing/WhySection';
 import FeaturesSection from '../../features/landing/FeaturesSection';
 import BuildersSection from '../../features/landing/BuildersSection';
-import TechStackSection from '../../features/landing/TechStackSection';
-import RoadmapSection from '../../features/landing/RoadmapSection';
+
 import PaathAISection from '../../features/landing/PaathAISection';
 import FounderSection from '../../features/landing/FounderSection';
 import StatsSection from '../../features/landing/StatsSection';
@@ -137,12 +136,6 @@ const LandingPage: React.FC = () => {
 
         {/* Built for Builders */}
         <BuildersSection />
-
-        {/* Technology Stack */}
-        <TechStackSection />
-
-        {/* Roadmap */}
-        <RoadmapSection />
 
         {/* About PaathAI */}
         <PaathAISection />

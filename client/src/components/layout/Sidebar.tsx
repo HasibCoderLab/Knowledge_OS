@@ -112,16 +112,20 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}
       >
-        {/* Logo */}
+        {/* Logo — clickable → home */}
         <div className="flex items-center justify-between px-4 py-5">
-          <div className="flex items-center gap-2.5">
+          <button
+            onClick={() => { navigate('/'); onClose(); }}
+            className="flex items-center gap-2.5 rounded-lg transition-all duration-200 hover:opacity-80 active:scale-[0.98] cursor-pointer"
+            aria-label="Go to home"
+          >
             <img
               src={knowledgeOSLogo}
               alt="KnowledgeOS"
               className="w-7 h-7 rounded-lg shadow-md shadow-indigo-500/25 shrink-0 object-cover"
             />
             <h1 className="text-[13px] font-bold text-slate-900 dark:text-white tracking-tight">{t('common.brand')}</h1>
-          </div>
+          </button>
           <button
             onClick={onClose}
             className="p-1.5 -mr-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer lg:hidden"
