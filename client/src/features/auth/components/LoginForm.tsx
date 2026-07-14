@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { useAuthStore } from '../../../store/authStore';
+import { useLanguage } from '../../../i18n/useLanguage';
 import Input from '../../../components/ui/Input';
 import Button from '../../../components/ui/Button';
 import PasswordInput from './PasswordInput';
@@ -15,6 +16,7 @@ interface FormErrors {
 
 const LoginForm: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const { login, isLoading, error, clearError } = useAuthStore();
 
   const [email, setEmail] = useState('');
@@ -27,15 +29,15 @@ const LoginForm: React.FC = () => {
     const newErrors: FormErrors = {};
 
     if (!email.trim()) {
-      newErrors.email = 'Email is required.';
+      newErrors.email = t('auth.login.errors.emailRequired');
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = 'Please enter a valid email address.';
+      newErrors.email = t('auth.login.errors.emailInvalid');
     }
 
     if (!password) {
-      newErrors.password = 'Password is required.';
+      newErrors.password = t('auth.login.errors.passwordRequired');
     } else if (password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters.';
+      newErrors.password = t('auth.login.errors.passwordMin');
     }
 
     setErrors(newErrors);
@@ -62,10 +64,10 @@ const LoginForm: React.FC = () => {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-          Sign in
+          {t('auth.login.title')}
         </h1>
         <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5">
-          Welcome back. Enter your credentials to continue.
+          {t('auth.login.subtitle')}
         </p>
       </div>
 
@@ -79,7 +81,7 @@ const LoginForm: React.FC = () => {
         </div>
         <div className="relative flex justify-center text-xs uppercase">
           <span className="bg-slate-50 dark:bg-slate-950 px-3 text-slate-400 dark:text-slate-500 font-medium tracking-wider">
-            or
+            {t('common.or')}
           </span>
         </div>
       </div>
@@ -105,9 +107,9 @@ const LoginForm: React.FC = () => {
         noValidate
       >
         <Input
-          label="Email"
+          label={t('auth.login.emailLabel')}
           type="email"
-          placeholder="you@example.com"
+          placeholder={t('auth.login.emailPlaceholder')}
           value={email}
           onChange={(e) => { setEmail(e.target.value); if (errors.email) setErrors((p) => ({ ...p, email: undefined })); }}
           error={errors.email}
@@ -116,8 +118,8 @@ const LoginForm: React.FC = () => {
         />
 
         <PasswordInput
-          label="Password"
-          placeholder="Enter your password"
+          label={t('auth.login.passwordLabel')}
+          placeholder={t('auth.login.passwordPlaceholder')}
           value={password}
           onChange={(e) => { setPassword(e.target.value); if (errors.password) setErrors((p) => ({ ...p, password: undefined })); }}
           error={errors.password}
@@ -133,13 +135,13 @@ const LoginForm: React.FC = () => {
               onChange={(e) => setRememberMe(e.target.checked)}
               className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-indigo-600 focus:ring-indigo-500/20 cursor-pointer"
             />
-            <span className="text-sm text-slate-600 dark:text-slate-400">Remember me</span>
+            <span className="text-sm text-slate-600 dark:text-slate-400">{t('auth.login.rememberMe')}</span>
           </label>
           <button
             type="button"
             className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors cursor-pointer"
           >
-            Forgot password?
+            {t('auth.login.forgotPassword')}
           </button>
         </div>
 
@@ -150,19 +152,19 @@ const LoginForm: React.FC = () => {
           isLoading={isLoading}
           className="w-full group"
         >
-          Sign In
+          {t('auth.login.submit')}
           {!isLoading && <ArrowRight size={16} className="ml-2 group-hover:translate-x-0.5 transition-transform" />}
         </Button>
       </motion.form>
 
       {/* Footer */}
       <p className="text-center text-sm text-slate-500 dark:text-slate-400">
-        Don't have an account?{' '}
+        {t('auth.login.noAccount')}{' '}
         <Link
           to="/auth/register"
           className="font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors"
         >
-          Create account
+          {t('auth.login.createAccount')}
         </Link>
       </p>
     </div>

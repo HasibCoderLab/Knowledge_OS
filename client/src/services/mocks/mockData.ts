@@ -108,6 +108,62 @@ export const MOCK_BOOKS: Book[] = [
     rating: null,
     tags: ['sci-fi', 'classic'],
   },
+  {
+    id: 'book-7',
+    title: 'The Psychology of Money',
+    author: 'Morgan Housel',
+    category: 'Finance',
+    coverUrl: 'https://m.media-amazon.com/images/I/71g2EDnjFJL._SY445_SX342_.jpg',
+    status: 'reading',
+    totalPages: 256,
+    currentPage: 78,
+    startDate: '2024-02-20',
+    finishDate: null,
+    rating: null,
+    tags: ['finance', 'psychology'],
+  },
+  {
+    id: 'book-8',
+    title: 'Clean Code',
+    author: 'Robert C. Martin',
+    category: 'Technology',
+    coverUrl: 'https://m.media-amazon.com/images/I/71T7aD3E7OL._SY445_SX342_.jpg',
+    status: 'wishlist',
+    totalPages: 464,
+    currentPage: 0,
+    startDate: null,
+    finishDate: null,
+    rating: null,
+    tags: ['programming', 'software'],
+  },
+  {
+    id: 'book-9',
+    title: 'The Almanack of Naval Ravikant',
+    author: 'Eric Jorgenson',
+    category: 'Philosophy',
+    coverUrl: 'https://m.media-amazon.com/images/I/71ayQ5xCN+L._SY445_SX342_.jpg',
+    status: 'completed',
+    totalPages: 242,
+    currentPage: 242,
+    startDate: '2024-01-05',
+    finishDate: '2024-02-01',
+    rating: 5,
+    tags: ['philosophy', 'wealth'],
+  },
+  {
+    id: 'book-10',
+    title: 'Designing Data-Intensive Applications',
+    author: 'Martin Kleppmann',
+    category: 'Technology',
+    coverUrl: 'https://m.media-amazon.com/images/I/71n5Q1kGQNL._SY445_SX342_.jpg',
+    status: 'wishlist',
+    totalPages: 616,
+    currentPage: 0,
+    startDate: null,
+    finishDate: null,
+    rating: null,
+    tags: ['architecture', 'distributed-systems'],
+  },
 ];
 
 export const MOCK_NOTES: Note[] = [
@@ -179,6 +235,8 @@ export const MOCK_HABITS: Habit[] = [
       { date: '2024-03-10', completed: true },
       { date: '2024-03-11', completed: true },
       { date: '2024-03-12', completed: true },
+      { date: '2024-03-13', completed: true },
+      { date: '2024-03-14', completed: true },
     ],
     createdAt: '2024-01-01',
   },
@@ -193,6 +251,7 @@ export const MOCK_HABITS: Habit[] = [
       { date: '2024-03-10', completed: true },
       { date: '2024-03-11', completed: true },
       { date: '2024-03-12', completed: false },
+      { date: '2024-03-13', completed: true },
     ],
     createdAt: '2024-01-01',
   },
@@ -207,6 +266,8 @@ export const MOCK_HABITS: Habit[] = [
       { date: '2024-03-10', completed: true },
       { date: '2024-03-11', completed: true },
       { date: '2024-03-12', completed: true },
+      { date: '2024-03-13', completed: true },
+      { date: '2024-03-14', completed: true },
     ],
     createdAt: '2024-01-01',
   },
@@ -219,6 +280,8 @@ export const MOCK_HABITS: Habit[] = [
     completedToday: true,
     logs: [
       { date: '2024-03-12', completed: true },
+      { date: '2024-03-13', completed: true },
+      { date: '2024-03-14', completed: true },
     ],
     createdAt: '2024-02-15',
   },
@@ -387,6 +450,60 @@ export const MOCK_JOURNAL: JournalEntry[] = [
     tags: ['gratitude', 'mindfulness'],
     createdAt: '2024-03-10',
   },
+  {
+    id: 'journal-5',
+    title: 'Learning Rust Basics',
+    content: 'Started learning Rust today. The ownership concept is unique but makes sense after going through the borrow checker examples. Built a simple CLI calculator as my first project.\n\nRust\'s pattern matching is incredibly powerful. Feeling excited about systems programming again.',
+    mood: 'good',
+    date: '2024-03-08',
+    tags: ['learning', 'rust', 'programming'],
+    createdAt: '2024-03-08',
+  },
+  {
+    id: 'journal-6',
+    title: 'Deep Work Session',
+    content: 'Completed a 2-hour deep work session on the new API design. Used the Pomodoro technique with 50-minute focus blocks. Made significant progress on the architecture.\n\nThe key was removing all distractions — phone on silent, notifications off, and a clear goal for the session.',
+    mood: 'great',
+    date: '2024-03-07',
+    tags: ['focus', 'productivity', 'coding'],
+    createdAt: '2024-03-07',
+  },
+  {
+    id: 'journal-7',
+    title: 'Book Reflections: Atomic Habits',
+    content: 'Just finished Part 2 of Atomic Habits. The concept of habit stacking is eye-opening. I\'ve started implementing: After I pour my morning coffee, I will meditate for 1 minute.\n\nThe book emphasizes identity-based habits rather than outcome-based. Instead of saying "I want to read more," say "I am a reader."',
+    mood: 'good',
+    date: '2024-03-06',
+    tags: ['reading', 'habits', 'reflection'],
+    createdAt: '2024-03-06',
+  },
+  {
+    id: 'journal-8',
+    title: 'Project Planning Session',
+    content: 'Spent the evening planning the KnowledgeOS dashboard redesign. Key decisions:\n- Use bento grid layout for dashboard\n- Add micro-interactions for delight\n- Implement glassmorphism for sidebar\n\nExcited about the direction. The goal is to make it feel as polished as Linear and Notion.',
+    mood: 'great',
+    date: '2024-03-05',
+    tags: ['planning', 'design', 'project'],
+    createdAt: '2024-03-05',
+  },
+  {
+    id: 'journal-9',
+    title: 'Evening Reflection',
+    content: 'Today was balanced. Worked on the project, exercised for 30 minutes, and read before bed. Feeling content with the rhythm I\'ve built.\n\nGrateful for:\n- The discipline I\'ve developed\n- Supportive team members\n- The joy of creating something meaningful',
+    mood: 'great',
+    date: '2024-03-04',
+    tags: ['reflection', 'gratitude'],
+    createdAt: '2024-03-04',
+  },
+  {
+    id: 'journal-10',
+    title: 'Overwhelmed by Tasks',
+    content: 'Too many things on my plate today. Need to prioritize better. The Eisenhower matrix might help — will categorize tasks into urgent/important tonight.\n\nLesson: Saying no to non-essential tasks is a superpower.',
+    mood: 'bad',
+    date: '2024-03-03',
+    tags: ['productivity', 'struggles'],
+    createdAt: '2024-03-03',
+  },
 ];
 
 export const MOCK_READING_SESSIONS: ReadingSession[] = [
@@ -394,7 +511,7 @@ export const MOCK_READING_SESSIONS: ReadingSession[] = [
     id: 'session-1',
     bookId: 'book-1',
     bookTitle: 'Atomic Habits',
-    date: '2024-03-11',
+    date: '2024-03-14',
     pagesRead: 25,
     durationMinutes: 35,
     startPage: 120,
@@ -404,7 +521,7 @@ export const MOCK_READING_SESSIONS: ReadingSession[] = [
     id: 'session-2',
     bookId: 'book-1',
     bookTitle: 'Atomic Habits',
-    date: '2024-03-10',
+    date: '2024-03-13',
     pagesRead: 40,
     durationMinutes: 55,
     startPage: 80,
@@ -414,7 +531,7 @@ export const MOCK_READING_SESSIONS: ReadingSession[] = [
     id: 'session-3',
     bookId: 'book-4',
     bookTitle: 'The Pragmatic Programmer',
-    date: '2024-03-12',
+    date: '2024-03-13',
     pagesRead: 30,
     durationMinutes: 45,
     startPage: 59,
@@ -424,7 +541,7 @@ export const MOCK_READING_SESSIONS: ReadingSession[] = [
     id: 'session-4',
     bookId: 'book-4',
     bookTitle: 'The Pragmatic Programmer',
-    date: '2024-03-09',
+    date: '2024-03-12',
     pagesRead: 35,
     durationMinutes: 50,
     startPage: 24,
@@ -434,21 +551,92 @@ export const MOCK_READING_SESSIONS: ReadingSession[] = [
     id: 'session-5',
     bookId: 'book-1',
     bookTitle: 'Atomic Habits',
-    date: '2024-03-08',
+    date: '2024-03-12',
     pagesRead: 20,
     durationMinutes: 30,
     startPage: 60,
     endPage: 80,
+  },
+  {
+    id: 'session-6',
+    bookId: 'book-7',
+    bookTitle: 'The Psychology of Money',
+    date: '2024-03-14',
+    pagesRead: 25,
+    durationMinutes: 40,
+    startPage: 53,
+    endPage: 78,
+  },
+  {
+    id: 'session-7',
+    bookId: 'book-7',
+    bookTitle: 'The Psychology of Money',
+    date: '2024-03-11',
+    pagesRead: 30,
+    durationMinutes: 42,
+    startPage: 23,
+    endPage: 53,
+  },
+  {
+    id: 'session-8',
+    bookId: 'book-1',
+    bookTitle: 'Atomic Habits',
+    date: '2024-03-10',
+    pagesRead: 35,
+    durationMinutes: 48,
+    startPage: 25,
+    endPage: 60,
+  },
+  {
+    id: 'session-9',
+    bookId: 'book-5',
+    bookTitle: 'Sapiens',
+    date: '2024-03-08',
+    pagesRead: 50,
+    durationMinutes: 60,
+    startPage: 393,
+    endPage: 443,
+  },
+  {
+    id: 'session-10',
+    bookId: 'book-1',
+    bookTitle: 'Atomic Habits',
+    date: '2024-03-07',
+    pagesRead: 25,
+    durationMinutes: 35,
+    startPage: 0,
+    endPage: 25,
+  },
+  {
+    id: 'session-11',
+    bookId: 'book-4',
+    bookTitle: 'The Pragmatic Programmer',
+    date: '2024-03-06',
+    pagesRead: 24,
+    durationMinutes: 38,
+    startPage: 0,
+    endPage: 24,
+  },
+  {
+    id: 'session-12',
+    bookId: 'book-7',
+    bookTitle: 'The Psychology of Money',
+    date: '2024-03-06',
+    pagesRead: 23,
+    durationMinutes: 35,
+    startPage: 0,
+    endPage: 23,
   },
 ];
 
 export const MOCK_EVENTS: CalendarEvent[] = [
   {
     id: 'event-1',
-    title: 'Read Atomic Habits Ch 4',
+    title: 'Read Atomic Habits Ch 4-5',
     date: '2024-03-15',
     time: '07:00',
     type: 'reading',
+    description: 'Finish chapters on habit stacking and environment design',
   },
   {
     id: 'event-2',
@@ -456,6 +644,7 @@ export const MOCK_EVENTS: CalendarEvent[] = [
     date: '2024-03-18',
     time: '10:00',
     type: 'task',
+    description: 'Configure GitHub Actions for automated deployment',
   },
   {
     id: 'event-3',
@@ -463,6 +652,7 @@ export const MOCK_EVENTS: CalendarEvent[] = [
     date: '2024-03-15',
     time: '06:30',
     type: 'habit',
+    description: '30 minutes of cardio',
   },
   {
     id: 'event-4',
@@ -470,6 +660,7 @@ export const MOCK_EVENTS: CalendarEvent[] = [
     date: '2024-03-20',
     time: '14:00',
     type: 'other',
+    description: 'Quarterly planning with the team',
   },
   {
     id: 'event-5',
@@ -477,6 +668,7 @@ export const MOCK_EVENTS: CalendarEvent[] = [
     date: '2024-03-15',
     time: '07:30',
     type: 'habit',
+    description: '10 minutes of mindfulness',
   },
   {
     id: 'event-6',
@@ -484,6 +676,79 @@ export const MOCK_EVENTS: CalendarEvent[] = [
     date: '2024-03-17',
     time: '20:00',
     type: 'goal',
+    description: 'Weekly review and planning',
+  },
+  {
+    id: 'event-7',
+    title: 'Read The Pragmatic Programmer Ch 3',
+    date: '2024-03-16',
+    time: '07:00',
+    type: 'reading',
+    description: 'Chapter on software entropy',
+  },
+  {
+    id: 'event-8',
+    title: 'Journal Writing',
+    date: '2024-03-15',
+    time: '21:00',
+    type: 'journal',
+    description: 'Evening reflection and gratitude',
+  },
+  {
+    id: 'event-9',
+    title: 'TypeScript Study Session',
+    date: '2024-03-19',
+    time: '18:00',
+    type: 'reading',
+    description: 'Advanced types and patterns',
+  },
+  {
+    id: 'event-10',
+    title: 'Project Standup',
+    date: '2024-03-15',
+    time: '09:00',
+    type: 'other',
+    description: 'Daily team standup',
+  },
+  {
+    id: 'event-11',
+    title: 'Read Psychology of Money Ch 5',
+    date: '2024-03-17',
+    time: '07:00',
+    type: 'reading',
+    description: 'Chapter on compounding',
+  },
+  {
+    id: 'event-12',
+    title: 'Weekly Review',
+    date: '2024-03-16',
+    time: '19:00',
+    type: 'goal',
+    description: 'Review weekly progress and adjust goals',
+  },
+  {
+    id: 'event-13',
+    title: 'Evening Workout',
+    date: '2024-03-18',
+    time: '18:30',
+    type: 'habit',
+    description: 'Strength training session',
+  },
+  {
+    id: 'event-14',
+    title: 'Read Sapiens Ch 12',
+    date: '2024-03-10',
+    time: '20:00',
+    type: 'reading',
+    description: 'The religious revolution',
+  },
+  {
+    id: 'event-15',
+    title: 'Deep Work Block',
+    date: '2024-03-19',
+    time: '08:00',
+    type: 'task',
+    description: '90-minute focused coding session',
   },
 ];
 
@@ -527,5 +792,239 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
     type: 'info',
     read: false,
     createdAt: '2024-03-14T20:00:00Z',
+  },
+];
+
+// ── Analytics Mock Data ──────────────────────────────────
+
+export interface AnalyticsDataPoint {
+  date: string;
+  value: number;
+}
+
+export interface AnalyticsCategory {
+  name: string;
+  value: number;
+  color: string;
+}
+
+export interface WeeklyReport {
+  week: string;
+  journalEntries: number;
+  readingHours: number;
+  tasksCompleted: number;
+  focusHours: number;
+}
+
+export interface MonthlyReport {
+  month: string;
+  entries: number;
+  booksFinished: number;
+  pagesRead: number;
+  avgFocusHours: number;
+}
+
+export interface AIInsight {
+  id: string;
+  type: 'productivity' | 'reading' | 'learning' | 'focus';
+  message: string;
+  trend: 'up' | 'down' | 'neutral';
+  percentage?: number;
+}
+
+export const MOCK_DAILY_ACTIVITY: AnalyticsDataPoint[] = [
+  { date: 'Mon', value: 4 },
+  { date: 'Tue', value: 6 },
+  { date: 'Wed', value: 3 },
+  { date: 'Thu', value: 8 },
+  { date: 'Fri', value: 5 },
+  { date: 'Sat', value: 7 },
+  { date: 'Sun', value: 9 },
+];
+
+export const MOCK_READING_TREND: AnalyticsDataPoint[] = [
+  { date: 'Week 1', value: 120 },
+  { date: 'Week 2', value: 180 },
+  { date: 'Week 3', value: 145 },
+  { date: 'Week 4', value: 210 },
+  { date: 'Week 5', value: 165 },
+  { date: 'Week 6', value: 240 },
+];
+
+export const MOCK_KNOWLEDGE_GROWTH: AnalyticsDataPoint[] = [
+  { date: 'Jan', value: 12 },
+  { date: 'Feb', value: 28 },
+  { date: 'Mar', value: 45 },
+  { date: 'Apr', value: 58 },
+  { date: 'May', value: 72 },
+  { date: 'Jun', value: 89 },
+];
+
+export const MOCK_FOCUS_HOURS: AnalyticsDataPoint[] = [
+  { date: 'Week 1', value: 8 },
+  { date: 'Week 2', value: 12 },
+  { date: 'Week 3', value: 10 },
+  { date: 'Week 4', value: 15 },
+  { date: 'Week 5', value: 11 },
+  { date: 'Week 6', value: 18 },
+];
+
+export const MOCK_CATEGORY_DISTRIBUTION: AnalyticsCategory[] = [
+  { name: 'Journal', value: 35, color: 'bg-indigo-500' },
+  { name: 'Reading', value: 25, color: 'bg-emerald-500' },
+  { name: 'Tasks', value: 20, color: 'bg-amber-500' },
+  { name: 'Learning', value: 12, color: 'bg-blue-500' },
+  { name: 'Other', value: 8, color: 'bg-violet-500' },
+];
+
+export const MOCK_WEEKLY_REPORTS: WeeklyReport[] = [
+  {
+    week: 'Mar 4 - Mar 10',
+    journalEntries: 4,
+    readingHours: 5.5,
+    tasksCompleted: 7,
+    focusHours: 8,
+  },
+  {
+    week: 'Feb 26 - Mar 3',
+    journalEntries: 3,
+    readingHours: 4.2,
+    tasksCompleted: 5,
+    focusHours: 6,
+  },
+  {
+    week: 'Feb 19 - Feb 25',
+    journalEntries: 5,
+    readingHours: 6.8,
+    tasksCompleted: 9,
+    focusHours: 10,
+  },
+];
+
+export const MOCK_MONTHLY_REPORTS: MonthlyReport[] = [
+  {
+    month: 'January',
+    entries: 15,
+    booksFinished: 2,
+    pagesRead: 480,
+    avgFocusHours: 6.5,
+  },
+  {
+    month: 'February',
+    entries: 18,
+    booksFinished: 1,
+    pagesRead: 520,
+    avgFocusHours: 7.2,
+  },
+  {
+    month: 'March',
+    entries: 10,
+    booksFinished: 1,
+    pagesRead: 340,
+    avgFocusHours: 8.1,
+  },
+];
+
+export const MOCK_AI_INSIGHTS: AIInsight[] = [
+  {
+    id: 'insight-1',
+    type: 'productivity',
+    message: 'You are most productive between 8 PM and 10 PM. Schedule deep work during this window.',
+    trend: 'up',
+    percentage: 23,
+  },
+  {
+    id: 'insight-2',
+    type: 'reading',
+    message: 'Reading consistency increased by 18% this month. Your morning habit is paying off.',
+    trend: 'up',
+    percentage: 18,
+  },
+  {
+    id: 'insight-3',
+    type: 'focus',
+    message: 'Focus sessions average 42 minutes. Try 90-minute blocks for deeper work.',
+    trend: 'neutral',
+  },
+  {
+    id: 'insight-4',
+    type: 'learning',
+    message: 'Your journal-to-reading ratio improved. Writing about what you read boosts retention.',
+    trend: 'up',
+    percentage: 32,
+  },
+];
+
+// ── Calendar / Schedule Mock Data ───────────────────────
+
+export interface DayEvent {
+  id: string;
+  title: string;
+  time: string;
+  type: 'reading' | 'task' | 'habit' | 'goal' | 'journal' | 'other';
+  description?: string;
+}
+
+export interface DaySchedule {
+  date: string;
+  dayName: string;
+  events: DayEvent[];
+}
+
+export const MOCK_DAY_SCHEDULES: DaySchedule[] = [
+  {
+    date: '2024-03-15',
+    dayName: 'Friday',
+    events: [
+      {
+        id: 'ev-1',
+        title: 'Morning Exercise',
+        time: '06:30',
+        type: 'habit',
+        description: '30 min cardio',
+      },
+      {
+        id: 'ev-2',
+        title: 'Read Atomic Habits Ch 4-5',
+        time: '07:00',
+        type: 'reading',
+      },
+      {
+        id: 'ev-3',
+        title: 'Meditation',
+        time: '07:30',
+        type: 'habit',
+      },
+      {
+        id: 'ev-4',
+        title: 'Team Standup',
+        time: '09:00',
+        type: 'other',
+      },
+      {
+        id: 'ev-5',
+        title: 'Evening Journal',
+        time: '21:00',
+        type: 'journal',
+      },
+    ],
+  },
+  {
+    date: '2024-03-16',
+    dayName: 'Saturday',
+    events: [
+      {
+        id: 'ev-6',
+        title: 'Read Pragmatic Programmer',
+        time: '07:00',
+        type: 'reading',
+      },
+      {
+        id: 'ev-7',
+        title: 'Weekly Review',
+        time: '19:00',
+        type: 'goal',
+      },
+    ],
   },
 ];

@@ -15,6 +15,11 @@ import type {
   JournalEntry, ReadingSession, CalendarEvent, Notification,
   ApiResponse,
 } from '../../types';
+import type {
+  AnalyticsDataPoint, AnalyticsCategory,
+  WeeklyReport, MonthlyReport, AIInsight,
+  DaySchedule,
+} from './mockData';
 
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -256,6 +261,53 @@ export const mockApi = {
     await sleep(400);
     const sessions = MOCK_READING_SESSIONS.filter((s) => s.bookId === bookId);
     return { success: true, data: sessions };
+  },
+
+  // Analytics
+  async getDailyActivity(): Promise<ApiResponse<AnalyticsDataPoint[]>> {
+    await sleep(500);
+    return { success: true, data: MOCK_DAILY_ACTIVITY };
+  },
+
+  async getReadingTrend(): Promise<ApiResponse<AnalyticsDataPoint[]>> {
+    await sleep(500);
+    return { success: true, data: MOCK_READING_TREND };
+  },
+
+  async getKnowledgeGrowth(): Promise<ApiResponse<AnalyticsDataPoint[]>> {
+    await sleep(500);
+    return { success: true, data: MOCK_KNOWLEDGE_GROWTH };
+  },
+
+  async getFocusHours(): Promise<ApiResponse<AnalyticsDataPoint[]>> {
+    await sleep(500);
+    return { success: true, data: MOCK_FOCUS_HOURS };
+  },
+
+  async getCategoryDistribution(): Promise<ApiResponse<AnalyticsCategory[]>> {
+    await sleep(400);
+    return { success: true, data: MOCK_CATEGORY_DISTRIBUTION };
+  },
+
+  async getWeeklyReports(): Promise<ApiResponse<WeeklyReport[]>> {
+    await sleep(500);
+    return { success: true, data: MOCK_WEEKLY_REPORTS };
+  },
+
+  async getMonthlyReports(): Promise<ApiResponse<MonthlyReport[]>> {
+    await sleep(500);
+    return { success: true, data: MOCK_MONTHLY_REPORTS };
+  },
+
+  async getAIInsights(): Promise<ApiResponse<AIInsight[]>> {
+    await sleep(300);
+    return { success: true, data: MOCK_AI_INSIGHTS };
+  },
+
+  async getDaySchedule(date: string): Promise<ApiResponse<DaySchedule | undefined>> {
+    await sleep(300);
+    const schedule = MOCK_DAY_SCHEDULES.find((s) => s.date === date);
+    return { success: true, data: schedule };
   },
 
   // Calendar

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { BrainCircuit, LayoutDashboard, Home, BookOpen } from 'lucide-react';
 import Button from '../../components/ui/Button';
+import { useLanguage } from '../../i18n/useLanguage';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -33,6 +34,7 @@ const floatAnimation = (delay: number, duration: number) => ({
 
 export const NotFound: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-slate-50 dark:bg-slate-950 selection:bg-indigo-500/30">
@@ -129,15 +131,14 @@ export const NotFound: React.FC = () => {
               variants={itemVariants}
               className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight mb-3"
             >
-              Page Not Found
+              {t('notFound.title')}
             </motion.h1>
 
-            {/* Description */}
             <motion.p
               variants={itemVariants}
               className="text-sm md:text-[15px] text-slate-500 dark:text-slate-400 leading-relaxed max-w-sm"
             >
-              The page you're looking for doesn't exist, has been moved, or the link may be outdated.
+              {t('notFound.description')}
             </motion.p>
 
             {/* Divider */}
@@ -157,7 +158,7 @@ export const NotFound: React.FC = () => {
                 onClick={() => navigate('/dashboard')}
               >
                 <LayoutDashboard size={16} />
-                Back to Dashboard
+                {t('common.backToDashboard')}
               </Button>
               <Button
                 variant="outline"
@@ -166,7 +167,7 @@ export const NotFound: React.FC = () => {
                 onClick={() => navigate('/')}
               >
                 <Home size={16} />
-                Go Home
+                {t('common.goHome')}
               </Button>
             </motion.div>
           </div>
@@ -180,7 +181,7 @@ export const NotFound: React.FC = () => {
           className="text-center text-xs text-slate-400 dark:text-slate-500 mt-6 flex items-center justify-center gap-1.5"
         >
           <BrainCircuit size={12} />
-          KnowledgeOS
+          {t('common.brand')}
         </motion.p>
       </motion.div>
     </div>

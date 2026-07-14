@@ -13,31 +13,35 @@ import {
   Settings,
   Search,
   Bell,
+  GitBranch,
   X,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import { useLanguage } from '../../i18n/useLanguage';
 import Avatar from '../ui/Avatar';
 
 const mainNav = [
-  { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
-  { label: 'Library', icon: BookOpen, path: '/library' },
-  { label: 'Notes', icon: FileText, path: '/notes' },
-  { label: 'Goals', icon: Target, path: '/goals' },
-  { label: 'Habits', icon: CheckSquare, path: '/habits' },
-  { label: 'Tasks', icon: ListChecks, path: '/tasks' },
-  { label: 'Journal', icon: BookMarked, path: '/journal' },
+  { labelKey: 'sidebar.items.dashboard', icon: LayoutDashboard, path: '/dashboard' },
+  { labelKey: 'sidebar.items.library', icon: BookOpen, path: '/library' },
+  { labelKey: 'sidebar.items.notes', icon: FileText, path: '/notes' },
+  { labelKey: 'sidebar.items.goals', icon: Target, path: '/goals' },
+  { labelKey: 'sidebar.items.habits', icon: CheckSquare, path: '/habits' },
+  { labelKey: 'sidebar.items.tasks', icon: ListChecks, path: '/tasks' },
+  { labelKey: 'sidebar.items.journal', icon: BookMarked, path: '/journal' },
 ];
 
 const secondaryNav = [
-  { label: 'Reading Tracker', icon: BookOpen, path: '/reading' },
-  { label: 'Analytics', icon: BarChart3, path: '/analytics' },
-  { label: 'Calendar', icon: Calendar, path: '/calendar' },
+  { labelKey: 'sidebar.items.docs', icon: BookMarked, path: '/docs' },
+  { labelKey: 'sidebar.items.siteMap', icon: GitBranch, path: '/site-map' },
+  { labelKey: 'sidebar.items.readingTracker', icon: BookOpen, path: '/reading' },
+  { labelKey: 'sidebar.items.analytics', icon: BarChart3, path: '/analytics' },
+  { labelKey: 'sidebar.items.calendar', icon: Calendar, path: '/calendar' },
 ];
 
 const systemNav = [
-  { label: 'Search', icon: Search, path: '/search' },
-  { label: 'Notifications', icon: Bell, path: '/notifications' },
-  { label: 'Settings', icon: Settings, path: '/settings' },
+  { labelKey: 'sidebar.items.search', icon: Search, path: '/search' },
+  { labelKey: 'sidebar.items.notifications', icon: Bell, path: '/notifications' },
+  { labelKey: 'sidebar.items.settings', icon: Settings, path: '/settings' },
 ];
 
 interface SidebarProps {
@@ -46,6 +50,7 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
+  const { t } = useLanguage();
   const { user } = useAuthStore();
   const location = useLocation();
   const activeRef = useRef<HTMLAnchorElement | null>(null);
@@ -89,7 +94,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             <div className="w-7 h-7 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg flex items-center justify-center text-white font-bold shadow-md shadow-indigo-500/25 shrink-0 text-xs">
               K
             </div>
-            <h1 className="text-[13px] font-bold text-slate-900 dark:text-white tracking-tight">KnowledgeOS</h1>
+            <h1 className="text-[13px] font-bold text-slate-900 dark:text-white tracking-tight">{t('common.brand')}</h1>
           </div>
           <button
             onClick={onClose}
@@ -103,7 +108,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         {/* Navigation */}
         <nav className="flex-1 px-2.5 space-y-0.5 overflow-y-auto">
           <p className="px-2.5 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1 mb-1.5">
-            Main
+            {t('sidebar.main')}
           </p>
           {mainNav.map((item) => (
             <NavLink
@@ -114,13 +119,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
               className={navLinkClass}
             >
               <item.icon size={16} strokeWidth={1.75} />
-              {item.label}
+              {t(item.labelKey)}
             </NavLink>
           ))}
 
           <div className="pt-4 mt-2 border-t border-slate-100 dark:border-slate-800/80">
             <p className="px-2.5 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5">
-              Insights
+              {t('sidebar.insights')}
             </p>
             {secondaryNav.map((item) => (
               <NavLink
@@ -131,14 +136,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 className={navLinkClass}
               >
                 <item.icon size={16} strokeWidth={1.75} />
-                {item.label}
+                {t(item.labelKey)}
               </NavLink>
             ))}
           </div>
 
           <div className="pt-4 mt-2 border-t border-slate-100 dark:border-slate-800/80">
             <p className="px-2.5 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5">
-              System
+              {t('sidebar.system')}
             </p>
             {systemNav.map((item) => (
               <NavLink
@@ -149,7 +154,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 className={navLinkClass}
               >
                 <item.icon size={16} strokeWidth={1.75} />
-                {item.label}
+                {t(item.labelKey)}
               </NavLink>
             ))}
           </div>

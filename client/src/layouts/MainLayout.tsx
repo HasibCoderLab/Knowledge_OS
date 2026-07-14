@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Menu } from 'lucide-react';
 import Sidebar from '../components/layout/Sidebar';
+import { useLanguage } from '../i18n/useLanguage';
 
 const MainLayout: React.FC = () => {
+  const { t } = useLanguage();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -29,7 +31,7 @@ const MainLayout: React.FC = () => {
           >
             <Menu size={20} />
           </button>
-          <h1 className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">KnowledgeOS</h1>
+          <h1 className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">{t('common.brand')}</h1>
         </header>
 
         <main id="main-content" className="flex-1 overflow-y-auto">

@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { useAuthStore } from '../../../store/authStore';
+import { useLanguage } from '../../../i18n/useLanguage';
 import Input from '../../../components/ui/Input';
 import Button from '../../../components/ui/Button';
 import PasswordInput from './PasswordInput';
@@ -18,6 +19,7 @@ interface FormErrors {
 
 const RegisterForm: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const { register, isLoading, error, clearError } = useAuthStore();
 
   const [name, setName] = useState('');
@@ -33,33 +35,33 @@ const RegisterForm: React.FC = () => {
     const newErrors: FormErrors = {};
 
     if (!name.trim()) {
-      newErrors.name = 'Full name is required.';
+      newErrors.name = t('auth.register.errors.nameRequired');
     } else if (name.trim().length < 2) {
-      newErrors.name = 'Name must be at least 2 characters.';
+      newErrors.name = t('auth.register.errors.nameMin');
     }
 
     if (!email.trim()) {
-      newErrors.email = 'Email is required.';
+      newErrors.email = t('auth.register.errors.emailRequired');
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = 'Please enter a valid email address.';
+      newErrors.email = t('auth.register.errors.emailInvalid');
     }
 
     if (!password) {
-      newErrors.password = 'Password is required.';
+      newErrors.password = t('auth.register.errors.passwordRequired');
     } else if (password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters.';
+      newErrors.password = t('auth.register.errors.passwordMin');
     } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
-      newErrors.password = 'Include uppercase, lowercase, and a number.';
+      newErrors.password = t('auth.register.errors.passwordComplexity');
     }
 
     if (!confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password.';
+      newErrors.confirmPassword = t('auth.register.errors.confirmRequired');
     } else if (password !== confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match.';
+      newErrors.confirmPassword = t('auth.register.errors.confirmMismatch');
     }
 
     if (!acceptTerms) {
-      newErrors.terms = 'You must accept the terms and conditions.';
+      newErrors.terms = t('auth.register.errors.termsRequired');
     }
 
     setErrors(newErrors);
@@ -90,10 +92,10 @@ const RegisterForm: React.FC = () => {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-          Create your account
+          {t('auth.register.title')}
         </h1>
         <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5">
-          Start organizing your knowledge today.
+          {t('auth.register.subtitle')}
         </p>
       </div>
 
@@ -107,7 +109,7 @@ const RegisterForm: React.FC = () => {
         </div>
         <div className="relative flex justify-center text-xs uppercase">
           <span className="bg-slate-50 dark:bg-slate-950 px-3 text-slate-400 dark:text-slate-500 font-medium tracking-wider">
-            or
+            {t('common.or')}
           </span>
         </div>
       </div>
@@ -133,9 +135,9 @@ const RegisterForm: React.FC = () => {
         noValidate
       >
         <Input
-          label="Full Name"
+          label={t('auth.register.nameLabel')}
           type="text"
-          placeholder="John Doe"
+          placeholder={t('auth.register.namePlaceholder')}
           value={name}
           onChange={(e) => { setName(e.target.value); clearFieldError('name'); }}
           error={errors.name}
@@ -144,9 +146,9 @@ const RegisterForm: React.FC = () => {
         />
 
         <Input
-          label="Username"
+          label={t('auth.register.usernameLabel')}
           type="text"
-          placeholder="johndoe (optional)"
+          placeholder={t('auth.register.usernamePlaceholder')}
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           autoComplete="username"
@@ -154,9 +156,9 @@ const RegisterForm: React.FC = () => {
         />
 
         <Input
-          label="Email"
+          label={t('auth.register.emailLabel')}
           type="email"
-          placeholder="you@example.com"
+          placeholder={t('auth.register.emailPlaceholder')}
           value={email}
           onChange={(e) => { setEmail(e.target.value); clearFieldError('email'); }}
           error={errors.email}
@@ -165,8 +167,8 @@ const RegisterForm: React.FC = () => {
         />
 
         <PasswordInput
-          label="Password"
-          placeholder="Min. 8 characters"
+          label={t('auth.register.passwordLabel')}
+          placeholder={t('auth.register.passwordPlaceholder')}
           value={password}
           onChange={(e) => { setPassword(e.target.value); clearFieldError('password'); }}
           error={errors.password}
@@ -175,8 +177,8 @@ const RegisterForm: React.FC = () => {
         />
 
         <PasswordInput
-          label="Confirm Password"
-          placeholder="Re-enter your password"
+          label={t('auth.register.confirmPasswordLabel')}
+          placeholder={t('auth.register.confirmPasswordPlaceholder')}
           value={confirmPassword}
           onChange={(e) => { setConfirmPassword(e.target.value); clearFieldError('confirmPassword'); }}
           error={errors.confirmPassword}
@@ -194,13 +196,13 @@ const RegisterForm: React.FC = () => {
               className="w-4 h-4 mt-0.5 rounded border-slate-300 dark:border-slate-600 text-indigo-600 focus:ring-indigo-500/20 cursor-pointer"
             />
             <span className="text-sm text-slate-600 dark:text-slate-400 leading-snug">
-              I agree to the{' '}
+              {t('auth.register.terms')}{' '}
               <button type="button" className="font-medium text-indigo-600 dark:text-indigo-400 hover:underline">
-                Terms of Service
+                {t('auth.register.termsOfService')}
               </button>{' '}
-              and{' '}
+              {t('auth.register.and')}{' '}
               <button type="button" className="font-medium text-indigo-600 dark:text-indigo-400 hover:underline">
-                Privacy Policy
+                {t('auth.register.privacyPolicy')}
               </button>
             </span>
           </label>
@@ -216,19 +218,19 @@ const RegisterForm: React.FC = () => {
           isLoading={isLoading}
           className="w-full group"
         >
-          Create Account
+          {t('auth.register.submit')}
           {!isLoading && <ArrowRight size={16} className="ml-2 group-hover:translate-x-0.5 transition-transform" />}
         </Button>
       </motion.form>
 
       {/* Footer */}
       <p className="text-center text-sm text-slate-500 dark:text-slate-400">
-        Already have an account?{' '}
+        {t('auth.register.hasAccount')}{' '}
         <Link
           to="/auth/login"
           className="font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors"
         >
-          Sign in
+          {t('auth.register.signIn')}
         </Link>
       </p>
     </div>

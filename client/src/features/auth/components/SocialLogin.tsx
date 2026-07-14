@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useLanguage } from '../../../i18n/useLanguage';
 
 interface SocialLoginProps {
   disabled?: boolean;
@@ -33,6 +34,7 @@ const GitHubIcon: React.FC = () => (
 );
 
 const SocialLogin: React.FC<SocialLoginProps> = ({ disabled = false }) => {
+  const { t } = useLanguage();
   return (
     <div className="space-y-3">
       <motion.button
@@ -40,10 +42,10 @@ const SocialLogin: React.FC<SocialLoginProps> = ({ disabled = false }) => {
         disabled={disabled}
         className="w-full flex items-center justify-center gap-3 px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
         type="button"
-        aria-label="Continue with Google"
+        aria-label={t('auth.social.google')}
       >
         <GoogleIcon />
-        Continue with Google
+        {t('auth.social.google')}
       </motion.button>
 
       <motion.button
@@ -51,10 +53,10 @@ const SocialLogin: React.FC<SocialLoginProps> = ({ disabled = false }) => {
         disabled={disabled}
         className="w-full flex items-center justify-center gap-3 px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
         type="button"
-        aria-label="Continue with GitHub"
+        aria-label={t('auth.social.github')}
       >
         <GitHubIcon />
-        Continue with GitHub
+        {t('auth.social.github')}
       </motion.button>
     </div>
   );

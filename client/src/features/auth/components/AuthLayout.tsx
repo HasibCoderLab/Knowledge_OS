@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import AuthBranding from './AuthBranding';
+import { useLanguage } from '../../../i18n/useLanguage';
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -18,6 +19,7 @@ const cardVariants = {
 };
 
 const AuthLayout: React.FC<AuthLayoutProps> = ({ children, mode }) => {
+  const { t } = useLanguage();
   return (
     <div className="min-h-screen flex bg-slate-50 dark:bg-slate-950">
       {/* Left branding panel — hidden on mobile */}
@@ -39,7 +41,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children, mode }) => {
               K
             </div>
             <span className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">
-              KnowledgeOS
+              {t('common.brand')}
             </span>
           </div>
 
