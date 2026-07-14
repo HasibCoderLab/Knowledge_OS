@@ -3,21 +3,41 @@ import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard,
   BookOpen,
+  BookMarked,
+  FileText,
   Target,
   CheckSquare,
-  FileText,
+  ListChecks,
+  BarChart3,
+  Calendar,
   Settings,
-  LogOut,
-  X
+  Search,
+  Bell,
+  X,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import Avatar from '../ui/Avatar';
 
-const navItems = [
+const mainNav = [
   { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
   { label: 'Library', icon: BookOpen, path: '/library' },
+  { label: 'Notes', icon: FileText, path: '/notes' },
   { label: 'Goals', icon: Target, path: '/goals' },
   { label: 'Habits', icon: CheckSquare, path: '/habits' },
-  { label: 'Journal', icon: FileText, path: '/journal' },
+  { label: 'Tasks', icon: ListChecks, path: '/tasks' },
+  { label: 'Journal', icon: BookMarked, path: '/journal' },
+];
+
+const secondaryNav = [
+  { label: 'Reading Tracker', icon: BookOpen, path: '/reading' },
+  { label: 'Analytics', icon: BarChart3, path: '/analytics' },
+  { label: 'Calendar', icon: Calendar, path: '/calendar' },
+];
+
+const systemNav = [
+  { label: 'Search', icon: Search, path: '/search' },
+  { label: 'Notifications', icon: Bell, path: '/notifications' },
+  { label: 'Settings', icon: Settings, path: '/settings' },
 ];
 
 interface SidebarProps {
@@ -26,11 +46,17 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
-  const { user, logout } = useAuthStore();
+  const { user } = useAuthStore();
+
+  const navLinkClass = ({ isActive }: { isActive: boolean }) =>
+    `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+      isActive
+        ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400'
+        : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800'
+    }`;
 
   return (
     <>
-      {/* Overlay backdrop - mobile/tablet only */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
@@ -49,7 +75,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}
       >
-        {/* Logo + Close */}
         <div className="flex items-center justify-between p-4 md:p-6">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-500/30 shrink-0">
@@ -66,64 +91,46 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        {/* Navigation */}
         <nav className="flex-1 px-3 md:px-4 space-y-0.5 overflow-y-auto">
-          <p className="px-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 mb-2">Main Menu</p>
-          {navItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              onClick={onClose}
-              className={({ isActive }) => `
-                flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all
-                ${isActive
-                  ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400'
-                  : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-900'}
-              `}
-            >
+          <p className="px-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 mb-2">Main</p>
+          {mainNav.map((item) => (
+            <NavLink key={item.path} to={item.path} onClick={onClose} className={navLinkClass}>
               <item.icon size={18} />
               {item.label}
             </NavLink>
           ))}
 
           <div className="pt-5 mt-2 border-t border-slate-100 dark:border-slate-800">
+            <p className="px-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Insights</p>
+            {secondaryNav.map((item) => (
+              <NavLink key={item.path} to={item.path} onClick={onClose} className={navLinkClass}>
+                <item.icon size={18} />
+                {item.label}
+              </NavLink>
+            ))}
+          </div>
+
+          <div className="pt-5 mt-2 border-t border-slate-100 dark:border-slate-800">
             <p className="px-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">System</p>
-            <NavLink
-              to="/settings"
-              onClick={onClose}
-              className={({ isActive }) => `
-                flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all
-                ${isActive
-                  ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400'
-                  : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-900'}
-              `}
-            >
-              <Settings size={18} />
-              Settings
-            </NavLink>
+            {systemNav.map((item) => (
+              <NavLink key={item.path} to={item.path} onClick={onClose} className={navLinkClass}>
+                <item.icon size={18} />
+                {item.label}
+              </NavLink>
+            ))}
           </div>
         </nav>
 
-        {/* User Section */}
         <div className="p-3 md:p-4 border-t border-slate-100 dark:border-slate-800">
-          <div className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors">
-            <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 font-bold text-xs shrink-0">
-              {user?.name?.[0] || 'U'}
-            </div>
+          <NavLink to="/profile" onClick={onClose} className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors">
+            <Avatar src={user?.avatar} name={user?.name} size="sm" />
             <div className="flex-1 min-w-0">
               <p className="text-xs font-semibold text-slate-900 dark:text-slate-100 truncate">
-                {user?.name || 'User'}
+                {user?.name ?? 'User'}
               </p>
               <p className="text-[10px] text-slate-500 truncate">{user?.email}</p>
             </div>
-            <button
-              onClick={logout}
-              className="p-1.5 text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors shrink-0"
-              title="Logout"
-            >
-              <LogOut size={16} />
-            </button>
-          </div>
+          </NavLink>
         </div>
       </aside>
     </>

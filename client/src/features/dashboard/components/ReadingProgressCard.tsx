@@ -1,4 +1,5 @@
 import React from 'react';
+import { BookOpen } from 'lucide-react';
 import Card from '../../../components/ui/Card';
 import Button from '../../../components/ui/Button';
 import Badge from '../../../components/ui/Badge';
@@ -14,10 +15,22 @@ interface Book {
 }
 
 interface ReadingProgressCardProps {
-  book: Book;
+  book?: Book | undefined;
 }
 
 const ReadingProgressCard: React.FC<ReadingProgressCardProps> = ({ book }) => {
+  if (!book) {
+    return (
+      <Card>
+        <div className="text-center py-8">
+          <BookOpen size={32} className="mx-auto text-slate-300 dark:text-slate-600 mb-3" />
+          <p className="text-sm text-slate-500 dark:text-slate-400">No book in progress</p>
+          <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Add a book to start tracking</p>
+        </div>
+      </Card>
+    );
+  }
+
   const progress = Math.round((book.currentPage / book.totalPages) * 100);
 
   return (
