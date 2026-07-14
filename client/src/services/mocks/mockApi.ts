@@ -18,6 +18,9 @@ import type {
 
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
+// Mutable state for notes CRUD
+let notesData: Note[] = MOCK_NOTES.map((n) => ({ ...n, tags: [...n.tags] }));
+
 export const mockApi = {
   // User
   async getUser(): Promise<ApiResponse<User>> {
@@ -46,16 +49,66 @@ export const mockApi = {
     return { success: true, data: null };
   },
 
-  // Notes
+  // Notes (mutable state for CRUD)
   async getNotes(): Promise<ApiResponse<Note[]>> {
     await sleep(600);
-    return { success: true, data: MOCK_NOTES };
+    return { success: true, data: notesData };
   },
 
   async getNotesByBook(bookId: string): Promise<ApiResponse<Note[]>> {
     await sleep(400);
-    const notes = MOCK_NOTES.filter((n) => n.bookId === bookId);
-    return { success: true, data: notes };
+    const filtered = notesData.filter((n) => n.bookId === bookId);
+    return { success: true, data: filtered };
+  },
+
+  async createNote(note: Omit<Note, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<Note>> {
+    await sleep(500);
+    const now = new Date().toISOString().split('T')[0]!;
+    const newNote: Note = {
+      ...note,
+      id: `note-${Date.now()}`,
+      createdAt: now,
+      updatedAt: now,
+    };
+    notesData = [newNote, ...notesData];
+    return { success: true, data: newNote };
+  },
+
+  async updateNote(id: string, updates: Partial<Note>): Promise<ApiResponse<Note | undefined>> {
+    await sleep(400);
+    const index = notesData.findIndex((n) => n.id === id);
+    if (index === -1) return { success: true, data: undefined };
+    notesData[index] = {
+      ...notesData[index]!,
+      ...updates,
+      id,
+      updatedAt: new Date().toISOString().split('T')[0]!,
+    };
+    return { success: true, data: notesData[index] };
+  },
+
+  async deleteNote(id: string): Promise<ApiResponse<null>> {
+    await sleep(300);
+    notesData = notesData.filter((n) => n.id !== id);
+    return { success: true, data: null };
+  },
+
+  async togglePinNote(id: string): Promise<ApiResponse<Note | undefined>> {
+    await sleep(200);
+    const note = notesData.find((n) => n.id === id);
+    if (!note) return { success: true, data: undefined };
+    note.isPinned = !note.isPinned;
+    note.updatedAt = new Date().toISOString().split('T')[0]!;
+    return { success: true, data: note };
+  },
+
+  async toggleFavoriteNote(id: string): Promise<ApiResponse<Note | undefined>> {
+    await sleep(200);
+    const note = notesData.find((n) => n.id === id);
+    if (!note) return { success: true, data: undefined };
+    note.isFavorite = !note.isFavorite;
+    note.updatedAt = new Date().toISOString().split('T')[0]!;
+    return { success: true, data: note };
   },
 
   // Habits
