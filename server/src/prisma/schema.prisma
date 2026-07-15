@@ -1,0 +1,262 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  email             String   @unique
+  password          String
+  name              String
+  avatar            String?
+  bio               String?
+  location          String?
+  refreshToken      String?
+  emailVerified     Boolean  @default(false)
+  verificationToken String?
+  resetToken        String?
+  resetTokenExp     DateTime?
+  theme             String   @default("system")
+  language          String   @default("en")
+  books             Book[]
+  readingSessions   ReadingSession[]
+  journalEntries    JournalEntry[]
+  goals             Goal[]
+  tasks             Task[]
+  habits            Habit[]
+  calendarEvents    CalendarEvent[]
+  notifications     Notification[]
+  activities        Activity[]
+  analyticsSnapshots AnalyticsSnapshot[]
+  notes             Note[]
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+}
+
+model Book {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String   @db.ObjectId
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title           String
+  author          String
+  category        String?
+  coverUrl        String?
+  status          String   @default("wishlist")
+  totalPages      Int?
+  currentPage     Int      @default(0)
+  startDate       DateTime?
+  finishDate      DateTime?
+  rating          Int?
+  tags            String[]
+  notes           Note[]
+  readingSessions ReadingSession[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId, status])
+  @@index([userId, title])
+}
+
+model Note {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookId    String?  @db.ObjectId
+  book      Book?    @relation(fields: [bookId], references: [id], onDelete: SetNull)
+  title     String
+  content   String
+  tags      String[]
+  isPinned  Boolean  @default(false)
+  isFavorite Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([bookId])
+}
+
+model ReadingSession {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String   @db.ObjectId
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookId          String   @db.ObjectId
+  book            Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  date            DateTime
+  pagesRead       Int
+  durationMinutes Int
+  startPage       Int
+  endPage         Int
+  createdAt       DateTime @default(now())
+
+  @@index([userId, bookId])
+  @@index([userId, date])
+}
+
+model JournalEntry {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  content   String
+  mood      String
+  date      DateTime
+  tags      String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, date])
+}
+
+model Goal {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String        @db.ObjectId
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  type        String        @default("short-term")
+  deadline    DateTime?
+  progress    Int           @default(0)
+  status      String        @default("active")
+  priority    String        @default("medium")
+  progressLogs GoalProgress[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([userId, status])
+}
+
+model GoalProgress {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  goalId    String   @db.ObjectId
+  goal      Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  value     Int
+  note      String?
+  date      DateTime @default(now())
+}
+
+model Task {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String   @db.ObjectId
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  priority    String   @default("medium")
+  dueDate     DateTime?
+  isCompleted Boolean  @default(false)
+  category    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId, isCompleted])
+  @@index([userId, priority])
+}
+
+model Habit {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String    @db.ObjectId
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  frequency   String    @default("daily")
+  logs        HabitLog[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+model HabitLog {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  habitId   String   @db.ObjectId
+  habit     Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  date      DateTime
+  completed Boolean  @default(true)
+
+  @@index([habitId, date])
+}
+
+model CalendarEvent {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String   @db.ObjectId
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  date        DateTime
+  time        String?
+  type        String   @default("other")
+  description String?
+  provider    String   @default("local")
+  providerId  String?
+  syncedAt    DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId, date])
+  @@index([userId, provider])
+}
+
+model AnalyticsSnapshot {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date      DateTime
+  type      String
+  data      Json
+  createdAt DateTime @default(now())
+
+  @@index([userId, type, date])
+}
+
+model Notification {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  type      String   @default("info")
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId, read])
+}
+
+model Activity {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String   @db.ObjectId
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type       String
+  action     String
+  entityId   String?
+  entityType String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+model UserSettings {
+  id               String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String  @unique @db.ObjectId
+  notifications    Boolean @default(true)
+  emailReports     Boolean @default(false)
+  weeklyReview     Boolean @default(true)
+  focusReminders   Boolean @default(false)
+  readingReminders Boolean @default(false)
+  theme            String  @default("system")
+  language         String  @default("en")
+}
+
+model AIConversation {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  title     String?
+  messages  Json[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
