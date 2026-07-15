@@ -15,8 +15,3 @@ export interface UserResponse {
   language: string;
   createdAt: Date;
 }
-
-export interface TokenResponse {
-  accessToken: string;
-  refreshToken: string;
-}

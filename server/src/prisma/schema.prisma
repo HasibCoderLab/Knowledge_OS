@@ -121,8 +121,10 @@ model Goal {
   type        String        @default("short-term")
   deadline    DateTime?
   progress    Int           @default(0)
-  status      String        @default("active")
+  status      String        @default("NOT_STARTED")
   priority    String        @default("medium")
+  targetValue Float         @default(100)
+  currentValue Float        @default(0)
   progressLogs GoalProgress[]
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
@@ -146,12 +148,15 @@ model Task {
   title       String
   description String?
   priority    String   @default("medium")
+  status      String   @default("TODO")
   dueDate     DateTime?
   isCompleted Boolean  @default(false)
+  goalId      String?  @db.ObjectId
   category    String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  @@index([userId, status])
   @@index([userId, isCompleted])
   @@index([userId, priority])
 }
@@ -248,6 +253,9 @@ model UserSettings {
   readingReminders Boolean @default(false)
   theme            String  @default("system")
   language         String  @default("en")
+  dailyReadingGoal Int     @default(0)
+  timezone         String  @default("UTC")
+  weekStartsOn     String  @default("monday")
 }
 
 model AIConversation {

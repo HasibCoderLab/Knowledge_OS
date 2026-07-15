@@ -1,6 +1,14 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { mockAuth, type AuthUser } from '../features/auth/services/mockAuth';
+import { authApi } from '../services/api/index';
+
+export interface AuthUser {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  username?: string;
+}
 
 interface AuthState {
   user: AuthUser | null;
@@ -27,22 +35,36 @@ export const useAuthStore = create<AuthState>()(
       login: async (email: string, password: string) => {
         set({ isLoading: true, error: null });
         try {
-          const { user, token } = await mockAuth.login({ email, password });
-          set({ user, accessToken: token, isAuthenticated: true, isLoading: false });
-        } catch (err) {
-          const message = err instanceof Error ? err.message : 'Login failed. Please try again.';
+          const result = await authApi.login({ email, password });
+          const { user, accessToken } = result as { user: AuthUser; accessToken: string; refreshToken: string };
+          localStorage.setItem('accessToken', accessToken);
+          set({ user, accessToken, isAuthenticated: true, isLoading: false });
+        } catch (err: unknown) {
+          const message =
+            err && typeof err === 'object' && 'response' in err
+              ? ((err as { response: { data: { message: string } } }).response?.data?.message ?? 'Login failed')
+              : err instanceof Error
+                ? err.message
+                : 'Login failed. Please try again.';
           set({ error: message, isLoading: false });
           throw err;
         }
       },
 
-      register: async (name: string, email: string, password: string, username?: string) => {
+      register: async (name: string, email: string, password: string) => {
         set({ isLoading: true, error: null });
         try {
-          const { user, token } = await mockAuth.register({ name, email, password, username });
-          set({ user, accessToken: token, isAuthenticated: true, isLoading: false });
-        } catch (err) {
-          const message = err instanceof Error ? err.message : 'Registration failed. Please try again.';
+          const result = await authApi.register({ name, email, password });
+          const { user, accessToken } = result as { user: AuthUser; accessToken: string; refreshToken: string };
+          localStorage.setItem('accessToken', accessToken);
+          set({ user, accessToken, isAuthenticated: true, isLoading: false });
+        } catch (err: unknown) {
+          const message =
+            err && typeof err === 'object' && 'response' in err
+              ? ((err as { response: { data: { message: string } } }).response?.data?.message ?? 'Registration failed')
+              : err instanceof Error
+                ? err.message
+                : 'Registration failed. Please try again.';
           set({ error: message, isLoading: false });
           throw err;
         }
@@ -51,21 +73,21 @@ export const useAuthStore = create<AuthState>()(
       logout: async () => {
         set({ isLoading: true });
         try {
-          await mockAuth.logout();
+          await authApi.logout();
+        } catch {
+          // proceed with local logout regardless
         } finally {
+          localStorage.removeItem('accessToken');
           set({ user: null, accessToken: null, isAuthenticated: false, isLoading: false, error: null });
         }
       },
 
       clearError: () => set({ error: null }),
 
-      setAuth: (user, token) =>
-        set({
-          user,
-          accessToken: token,
-          isAuthenticated: true,
-          error: null,
-        }),
+      setAuth: (user, token) => {
+        if (token) localStorage.setItem('accessToken', token);
+        set({ user, accessToken: token, isAuthenticated: true, error: null });
+      },
     }),
     {
       name: 'auth-storage',

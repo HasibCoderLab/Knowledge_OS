@@ -34,11 +34,13 @@ export function sendPaginated<T>(
   page: number,
   limit: number,
   message: string = 'Success',
+  extra?: Record<string, unknown>,
 ): void {
   const response = {
     success: true,
     message,
     data,
+    ...extra,
     pagination: {
       total,
       page,
