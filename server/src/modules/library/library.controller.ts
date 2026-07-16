@@ -6,7 +6,7 @@ import { asyncHandler } from '../../shared/asyncHandler.js';
 import type { BookQuery } from './library.validation.js';
 
 export const getLibrary = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-  const query = req.query as unknown as BookQuery;
+  const query = res.locals.validatedQuery as BookQuery;
   const result = await libraryService.getLibrary(req.user!.userId, query);
   sendPaginated(res, result.data, result.total, result.page, result.limit);
 });

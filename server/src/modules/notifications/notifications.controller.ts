@@ -6,7 +6,7 @@ import { asyncHandler } from '../../shared/asyncHandler.js';
 import type { NotificationsQuery } from './notifications.validation.js';
 
 export const getNotifications = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-  const query = req.query as unknown as NotificationsQuery;
+  const query = res.locals.validatedQuery as NotificationsQuery;
   const result = await notificationsService.getNotifications(req.user!.userId, query);
   const { unreadCount } = result;
   sendPaginated(res, result.data, result.total, result.page, result.limit, 'Success', { unreadCount });

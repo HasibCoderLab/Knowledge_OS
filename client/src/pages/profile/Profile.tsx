@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import {
   Mail, Calendar, BookOpen, BookMarked, FileText,
   Target, CheckSquare, ListChecks, Flame, Activity,
-  LogOut, Camera, Pencil, ArrowRight, Clock, TrendingUp, Quote, Settings, User, MapPin, Link, GitCommit,
+  LogOut, Pencil, ArrowRight, Clock, TrendingUp, Quote, User,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { libraryApi, readingApi, journalApi, goalsApi, tasksApi, habitsApi, settingsApi } from '../../services/api/index';
@@ -225,91 +225,71 @@ export const Profile: React.FC = () => {
 
       {/* ═══ PREMIUM HERO CARD ═══ */}
       <motion.div variants={fadeUp} className="relative">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/[0.03] to-transparent rounded-3xl -mx-2 -mt-2 p-6 pointer-events-none" />
-        
         <div className="relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 md:p-8 shadow-sm hover:shadow-md transition-shadow duration-300">
-          
-          {/* Left: Avatar & Info */}
-          <div className="flex flex-col md:flex-row gap-6 md:gap-10 items-start">
-            <div className="relative group shrink-0">
-              <Avatar src={user?.avatar ?? undefined} name={user?.name} size="xl" className="!w-24 !h-24 md:!w-28 md:!h-28 ring-4 ring-white dark:ring-slate-800 shadow-xl" />
-              <button
-                onClick={() => navigate('/settings/profile')}
-                className="absolute -bottom-1 -right-1 p-2 rounded-full bg-indigo-600 text-white shadow-md hover:bg-indigo-700 transition-colors cursor-pointer"
-                aria-label="Change avatar"
-              >
-                <Camera size={14} />
-              </button>
-            </div>
 
-            <div className="flex-1 min-w-0">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 flex-wrap">
-                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
+          {/* Header Row: Avatar + Name + Actions */}
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-5">
+              <div className="relative group shrink-0">
+                <Avatar src={user?.avatar ?? undefined} name={user?.name} size="xl" className="!w-20 !h-20 md:!w-24 md:!h-24 ring-4 ring-white dark:ring-slate-800 shadow-xl" />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
                   {user?.name ?? 'User'}
                 </h1>
                 {user?.username && (
-                  <span className="text-base md:text-lg text-slate-400 dark:text-slate-500 font-normal self-center">@{user.username}</span>
+                  <p className="text-sm md:text-base text-slate-400 dark:text-slate-500 font-medium mt-0.5">@{user.username}</p>
                 )}
               </div>
-
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-3 text-sm text-slate-500 dark:text-slate-400">
-                {user?.email && (
-                  <span className="flex items-center gap-1.5">
-                    <Mail size={13} className="text-slate-400" />
-                    {user.email}
-                  </span>
-                )}
-                {user?.location && (
-                  <span className="flex items-center gap-1.5">
-                    <MapPin size={13} className="text-slate-400" />
-                    {user.location}
-                  </span>
-                )}
-                {createdDate && (
-                  <span className="flex items-center gap-1.5">
-                    <Calendar size={13} className="text-slate-400" />
-                    Joined {createdDate}
-                  </span>
-                )}
-              </div>
-
-              {user?.bio && (
-                <p className="mt-4 text-sm md:text-[15px] text-slate-600 dark:text-slate-300 leading-relaxed max-w-xl">
-                  {user.bio}
-                </p>
-              )}
             </div>
 
-            {/* Right: Quick Stats & Actions */}
-            <div className="flex flex-col items-start md:items-end gap-3 md:gap-4 shrink-0 mt-2 md:mt-0 w-full md:w-auto">
-              {/* Quick Stats */}
-              <div className="flex gap-4 md:gap-6 p-4 md:p-0 bg-slate-50 dark:bg-slate-800/50 rounded-2xl w-full md:w-auto border border-slate-200 dark:border-slate-800">
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums">{stats.currentStreak}</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Streak</p>
-                </div>
-                <div className="w-px h-10 bg-slate-200 dark:bg-slate-700 mx-2" />
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums">{stats.booksCompleted}</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Books</p>
-                </div>
-                <div className="w-px h-10 bg-slate-200 dark:bg-slate-700 mx-2" />
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums">{stats.totalPagesRead.toLocaleString()}</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Pages</p>
-                </div>
-              </div>
+            <div className="flex items-center gap-2.5 shrink-0">
+              <Button variant="outline" size="sm" className="gap-1.5" onClick={() => navigate('/settings/profile')}>
+                <Pencil size={13} />
+                <span className="hidden sm:inline">Edit Profile</span>
+              </Button>
+              <Button variant="ghost" size="sm" className="gap-1.5 text-slate-400 hover:text-red-500" onClick={handleLogout}>
+                <LogOut size={13} />
+              </Button>
+            </div>
+          </div>
 
-              {/* Primary Actions */}
-              <div className="flex items-center gap-2 md:gap-3 flex-wrap">
-                <Button variant="outline" size="sm" className="gap-1.5" onClick={() => navigate('/settings/profile')}>
-                  <Pencil size={13} />
-                  <span className="hidden sm:inline">Edit Profile</span>
-                </Button>
-                <Button variant="ghost" size="sm" className="gap-1.5 text-slate-400 hover:text-red-500" onClick={handleLogout}>
-                  <LogOut size={13} />
-                </Button>
-              </div>
+          {/* Info Card: Email · Username · Joined */}
+          <div className="mt-6 p-4 md:p-5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-2xl">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+              {user?.email && (
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 shrink-0">
+                    <Mail size={16} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">Email</p>
+                    <p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">{user.email}</p>
+                  </div>
+                </div>
+              )}
+              {user?.username && (
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shrink-0">
+                    <User size={16} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">Username</p>
+                    <p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">@{user.username}</p>
+                  </div>
+                </div>
+              )}
+              {createdDate && (
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 shrink-0">
+                    <Calendar size={16} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">Joined</p>
+                    <p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">{createdDate}</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

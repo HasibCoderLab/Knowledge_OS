@@ -6,7 +6,7 @@ import { asyncHandler } from '../../shared/asyncHandler.js';
 import type { ActivitiesQuery } from './activities.validation.js';
 
 export const getActivities = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-  const query = req.query as unknown as ActivitiesQuery;
+  const query = res.locals.validatedQuery as ActivitiesQuery;
   const result = await activityService.getActivities(req.user!.userId, query);
   sendPaginated(res, result.data, result.total, result.page, result.limit);
 });

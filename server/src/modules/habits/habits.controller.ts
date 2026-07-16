@@ -6,7 +6,7 @@ import { asyncHandler } from '../../shared/asyncHandler.js';
 import type { HabitsQuery } from './habits.validation.js';
 
 export const getHabits = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-  const query = req.query as unknown as HabitsQuery;
+  const query = res.locals.validatedQuery as HabitsQuery;
   const result = await habitsService.getHabits(req.user!.userId, query);
   sendPaginated(res, result.data, result.total, result.page, result.limit);
 });

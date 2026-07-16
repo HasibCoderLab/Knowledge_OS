@@ -6,7 +6,7 @@ import { asyncHandler } from '../../shared/asyncHandler.js';
 import type { ReadingSessionsQuery } from './reading.validation.js';
 
 export const getReadingSessions = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-  const query = req.query as unknown as ReadingSessionsQuery;
+  const query = res.locals.validatedQuery as ReadingSessionsQuery;
   const result = await readingService.getReadingSessions(req.user!.userId, query);
   sendPaginated(res, result.data, result.total, result.page, result.limit);
 });

@@ -6,7 +6,7 @@ import { asyncHandler } from '../../shared/asyncHandler.js';
 import type { TasksQuery } from './tasks.validation.js';
 
 export const getTasks = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-  const query = req.query as unknown as TasksQuery;
+  const query = res.locals.validatedQuery as TasksQuery;
   const result = await tasksService.getTasks(req.user!.userId, query);
   sendPaginated(res, result.data, result.total, result.page, result.limit);
 });

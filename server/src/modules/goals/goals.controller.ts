@@ -6,7 +6,7 @@ import { asyncHandler } from '../../shared/asyncHandler.js';
 import type { GoalsQuery } from './goals.validation.js';
 
 export const getGoals = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-  const query = req.query as unknown as GoalsQuery;
+  const query = res.locals.validatedQuery as GoalsQuery;
   const result = await goalsService.getGoals(req.user!.userId, query);
   sendPaginated(res, result.data, result.total, result.page, result.limit);
 });

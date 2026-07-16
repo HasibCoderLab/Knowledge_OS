@@ -6,7 +6,7 @@ import { asyncHandler } from '../../shared/asyncHandler.js';
 import type { JournalEntriesQuery } from './journal.validation.js';
 
 export const getJournalEntries = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-  const query = req.query as unknown as JournalEntriesQuery;
+  const query = res.locals.validatedQuery as JournalEntriesQuery;
   const result = await journalService.getJournalEntries(req.user!.userId, query);
   sendPaginated(res, result.data, result.total, result.page, result.limit);
 });
