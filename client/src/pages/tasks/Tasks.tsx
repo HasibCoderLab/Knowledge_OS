@@ -2,7 +2,7 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { ListChecks, Plus, AlertTriangle } from 'lucide-react';
-import { mockApi } from '../../services/mocks/mockApi';
+import { tasksApi } from '../../services/api/index';
 import TaskItem from '../../features/tasks/components/TaskItem';
 import TaskFilters from '../../features/tasks/components/TaskFilters';
 import TaskForm from '../../features/tasks/components/TaskForm';
@@ -33,10 +33,13 @@ export const Tasks: React.FC = () => {
 
   const { data, isLoading } = useQuery({
     queryKey: ['tasks'],
-    queryFn: mockApi.getTasks,
+    queryFn: () => tasksApi.getAll({ limit: 1000 }),
   });
 
-  const tasks = data?.data ?? [];
+  const tasks: Task[] = (data?.data ?? []).map((t: Record<string, unknown>) => ({
+    ...t,
+    isCompleted: (t.status as string) === 'DONE',
+  })) as Task[];
 
   const invalidate = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: ['tasks'] });
@@ -77,10 +80,10 @@ export const Tasks: React.FC = () => {
 
   const handleCreate = useCallback(async (formData: TaskFormData) => {
     setIsSaving(true);
-    await mockApi.createTask({
+    await tasksApi.create({
       ...formData,
-      isCompleted: false,
-    });
+      status: 'TODO',
+    } as unknown as Record<string, unknown>);
     setIsSaving(false);
     setIsCreating(false);
     invalidate();
@@ -89,7 +92,7 @@ export const Tasks: React.FC = () => {
   const handleUpdate = useCallback(async (formData: TaskFormData) => {
     if (!editingTask) return;
     setIsSaving(true);
-    await mockApi.updateTask(editingTask.id, formData);
+    await tasksApi.update(editingTask.id, formData as unknown as Record<string, unknown>);
     setIsSaving(false);
     setEditingTask(null);
     invalidate();
@@ -97,13 +100,13 @@ export const Tasks: React.FC = () => {
 
   const handleDelete = useCallback(async () => {
     if (!deletingTask) return;
-    await mockApi.deleteTask(deletingTask.id);
+    await tasksApi.delete(deletingTask.id);
     setDeletingTask(null);
     invalidate();
   }, [deletingTask, invalidate]);
 
   const handleToggle = useCallback(async (task: Task) => {
-    await mockApi.updateTask(task.id, { isCompleted: !task.isCompleted });
+    await tasksApi.update(task.id, { status: task.isCompleted ? 'TODO' : 'DONE' });
     invalidate();
   }, [invalidate]);
 

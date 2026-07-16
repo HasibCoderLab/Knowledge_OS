@@ -1,89 +1,89 @@
-# Knowledge OS - Full Deployment Setup Guide
+# নলেজ ওএস (Knowledge OS) - ফুল ডেপ্লয়মেন্ট সেটআপ গাইড
 
-This guide provides step-by-step instructions to deploy the Knowledge OS project. 
-The project is a monorepo containing a React/Vite frontend (`client`) and an Express/Prisma Node.js backend (`server`).
+এই গাইডটি Knowledge OS প্রজেক্ট ডেপ্লয় করার জন্য ধাপে ধাপে নির্দেশনা প্রদান করে।
+প্রজেক্টটি একটি মনোরেপো (monorepo), যাতে একটি React/Vite ফ্রন্টএন্ড (`client`) এবং একটি Express/Prisma Node.js ব্যাকএন্ড (`server`) রয়েছে।
 
-## Table of Contents
-1. [Backend Deployment (Render)](#backend-deployment-render)
-2. [Frontend Deployment (Vercel)](#frontend-deployment-vercel)
+## সূচিপত্র (Table of Contents)
+1. [ব্যাকএন্ড ডেপ্লয়মেন্ট (Render)](#backend-deployment-render)
+2. [ফ্রন্টএন্ড ডেপ্লয়মেন্ট (Vercel)](#frontend-deployment-vercel)
 
 ---
 
-## Backend Deployment (Render)
+## ব্যাকএন্ড ডেপ্লয়মেন্ট (Render)
 
-We will deploy the backend to [Render](https://render.com/), which is great for Node.js APIs and databases.
+আমরা আমাদের ব্যাকএন্ড [Render](https://render.com/)-এ ডেপ্লয় করবো, যা Node.js API এবং ডাটাবেসের জন্য দারুণ।
 
-### Prerequisites
-1. Push your full repository to GitHub.
-2. Make sure your `server/package.json` has the following scripts (they are already set up):
+### পূর্বশর্ত (Prerequisites)
+1. আপনার সম্পূর্ণ রিপোজিটরি GitHub-এ পুশ (Push) করুন।
+2. নিশ্চিত করুন যে আপনার `server/package.json` ফাইলে নিচের স্ক্রিপ্টগুলো আছে (এগুলো আগে থেকেই সেটআপ করা আছে):
    - `"build": "tsc && prisma generate"`
    - `"start": "node dist/app/server.js"`
 
-### Steps to Deploy on Render
+### Render-এ ডেপ্লয় করার ধাপসমূহ
 
-1. **Sign Up / Log In**: Go to [Render](https://dashboard.render.com/) and sign in with GitHub.
-2. **Create Database (Optional but Recommended)**: 
-   - Click **New +** -> **PostgreSQL**.
-   - Give it a name and create the database.
-   - Once created, copy the **Internal Database URL** (if keeping on Render) or **External Database URL**.
-3. **Create Web Service**:
-   - Click **New +** -> **Web Service**.
-   - Connect your GitHub repository.
-4. **Configure Web Service**:
-   - **Name**: `knowledge-os-backend` (or your preferred name)
+1. **Sign Up / Log In**: [Render](https://dashboard.render.com/)-এ যান এবং GitHub দিয়ে সাইন ইন করুন।
+2. **ডাটাবেস তৈরি করুন (Create Database) (ঐচ্ছিক কিন্তু প্রস্তাবিত)**:
+   - **New +** -> **PostgreSQL** এ ক্লিক করুন।
+   - এটিকে একটি নাম দিন এবং ডাটাবেস তৈরি করুন।
+   - তৈরি হয়ে গেলে, **Internal Database URL** (যদি Render-এই রাখেন) অথবা **External Database URL** কপি করুন।
+3. **ওয়েব সার্ভিস তৈরি করুন (Create Web Service)**:
+   - **New +** -> **Web Service** এ ক্লিক করুন।
+   - আপনার GitHub রিপোজিটরি কানেক্ট করুন।
+4. **ওয়েব সার্ভিস কনফিগার করুন**:
+   - **Name**: `knowledge-os-backend` (অথবা আপনার পছন্দের নাম)
    - **Root Directory**: `server`
    - **Environment**: `Node`
    - **Build Command**: `npm install && npm run build`
    - **Start Command**: `npm start`
-5. **Set Environment Variables**:
-   Scroll down to the **Environment Variables** section and add the required variables from your `server/.env` file:
-   - `PORT`: `10000` (Render default)
-   - `DATABASE_URL`: `your_postgresql_database_url` (from step 2, or your existing database provider like Supabase/Neon)
+5. **এনভায়রনমেন্ট ভেরিয়েবল সেট করুন (Set Environment Variables)**:
+   নিচে স্ক্রল করে **Environment Variables** সেকশনে যান এবং আপনার `server/.env` ফাইল থেকে প্রয়োজনীয় ভেরিয়েবলগুলো যোগ করুন:
+   - `PORT`: `10000` (Render-এর ডিফল্ট)
+   - `DATABASE_URL`: `your_postgresql_database_url` (ধাপ ২ থেকে, অথবা Supabase/Neon-এর মতো আপনার বর্তমান ডাটাবেস প্রোভাইডার থেকে)
    - `JWT_SECRET`: `your_super_secret_jwt_key`
-   - `CORS_ORIGIN`: `*` (Change this to your Vercel frontend URL after frontend deployment for security, e.g., `https://knowledge-os.vercel.app`)
-6. **Deploy**:
-   - Click **Create Web Service**. 
-   - Render will start building your backend. Wait for it to show "Live".
-   - Copy the deployed backend URL (e.g., `https://knowledge-os-backend.onrender.com`). You will need this for the frontend.
+   - `CORS_ORIGIN`: `*` (নিরাপত্তার জন্য ফ্রন্টএন্ড ডেপ্লয়মেন্টের পর এটিকে আপনার Vercel ফ্রন্টএন্ড URL-এ পরিবর্তন করুন, যেমন, `https://knowledge-os.vercel.app`)
+6. **ডেপ্লয় করুন (Deploy)**:
+   - **Create Web Service** এ ক্লিক করুন।
+   - Render আপনার ব্যাকএন্ড বিল্ড করা শুরু করবে। "Live" লেখা আসা পর্যন্ত অপেক্ষা করুন।
+   - ডেপ্লয় করা ব্যাকএন্ডের URL কপি করুন (যেমন, `https://knowledge-os-backend.onrender.com`)। ফ্রন্টএন্ডের জন্য আপনার এটি প্রয়োজন হবে।
 
 ---
 
-## Frontend Deployment (Vercel)
+## ফ্রন্টএন্ড ডেপ্লয়মেন্ট (Vercel)
 
-We will deploy the frontend to [Vercel](https://vercel.com/), which provides seamless hosting for Vite and React apps.
+আমরা ফ্রন্টএন্ড [Vercel](https://vercel.com/)-এ ডেপ্লয় করবো, যা Vite এবং React অ্যাপগুলোর জন্য নির্বিঘ্ন হোস্টিং প্রদান করে।
 
-### Prerequisites
-1. Have the deployed Backend URL from Render ready.
+### পূর্বশর্ত (Prerequisites)
+1. Render থেকে ডেপ্লয় করা ব্যাকএন্ড URL টি প্রস্তুত রাখুন।
 
-### Steps to Deploy on Vercel
+### Vercel-এ ডেপ্লয় করার ধাপসমূহ
 
-1. **Sign Up / Log In**: Go to [Vercel](https://vercel.com/) and sign in with GitHub.
-2. **Add New Project**:
-   - Click **Add New...** -> **Project**.
-   - Import your GitHub repository.
-3. **Configure Project**:
+1. **Sign Up / Log In**: [Vercel](https://vercel.com/)-এ যান এবং GitHub দিয়ে সাইন ইন করুন।
+2. **নতুন প্রজেক্ট যোগ করুন (Add New Project)**:
+   - **Add New...** -> **Project** এ ক্লিক করুন।
+   - আপনার GitHub রিপোজিটরি ইমপোর্ট (Import) করুন।
+3. **প্রজেক্ট কনফিগার করুন**:
    - **Project Name**: `knowledge-os-client`
    - **Framework Preset**: `Vite`
-   - **Root Directory**: Click "Edit" and select `client`.
-4. **Build and Output Settings**:
-   Vercel usually detects these automatically for Vite, but verify:
+   - **Root Directory**: "Edit" এ ক্লিক করে `client` সিলেক্ট করুন।
+4. **বিল্ড এবং আউটপুট সেটিংস (Build and Output Settings)**:
+   Vercel সাধারণত Vite-এর জন্য এগুলো স্বয়ংক্রিয়ভাবে ডিটেক্ট করে, কিন্তু যাচাই করে নিন:
    - **Build Command**: `npm run build`
    - **Output Directory**: `dist`
-5. **Set Environment Variables**:
-   Expand the **Environment Variables** section. Add your variables from `client/.env` (if any). Crucially, set the API URL:
-   - `VITE_API_URL`: `https://knowledge-os-backend.onrender.com/api` (Replace with your actual Render backend URL)
-6. **Deploy**:
-   - Click **Deploy**.
-   - Vercel will build and deploy your site.
-7. **Finalize Backend CORS**:
-   - Once Vercel gives you your frontend URL (e.g., `https://knowledge-os.vercel.app`), go back to your **Render Dashboard**.
-   - Open your backend service -> **Environment**.
-   - Update `CORS_ORIGIN` to match your Vercel URL.
-   - Save changes (Render will automatically restart the backend).
+5. **এনভায়রনমেন্ট ভেরিয়েবল সেট করুন (Set Environment Variables)**:
+   **Environment Variables** সেকশনটি এক্সপ্যান্ড (Expand) করুন। আপনার `client/.env` (যদি থাকে) থেকে ভেরিয়েবলগুলো যোগ করুন। সবচেয়ে গুরুত্বপূর্ণ হলো API URL সেট করা:
+   - `VITE_API_URL`: `https://knowledge-os-backend.onrender.com/api` (আপনার আসল Render ব্যাকএন্ড URL দিয়ে রিপ্লেস করুন)
+6. **ডেপ্লয় করুন (Deploy)**:
+   - **Deploy** এ ক্লিক করুন।
+   - Vercel আপনার সাইট বিল্ড এবং ডেপ্লয় করবে।
+7. **ব্যাকএন্ড CORS চূড়ান্ত করুন (Finalize Backend CORS)**:
+   - Vercel যখন আপনাকে আপনার ফ্রন্টএন্ড URL (যেমন, `https://knowledge-os.vercel.app`) দেবে, তখন আপনার **Render Dashboard**-এ ফিরে যান।
+   - আপনার ব্যাকএন্ড সার্ভিস খুলুন -> **Environment**।
+   - আপনার Vercel URL-এর সাথে মেলাতে `CORS_ORIGIN` আপডেট করুন।
+   - পরিবর্তনগুলো সেভ করুন (Render স্বয়ংক্রিয়ভাবে ব্যাকএন্ড রিস্টার্ট করবে)।
 
 ---
 
-## Troubleshooting
+## সমস্যা সমাধান (Troubleshooting)
 
-- **Database Errors on Render**: Make sure you have run `prisma generate` in your build command, and if you need to push schema changes, consider running `npx prisma db push` as part of your deploy script or running it manually locally connecting to the production DB.
-- **Frontend not fetching data**: Open browser developer tools (F12) -> Network tab. Check if the requests are failing. Ensure `VITE_API_URL` is set correctly in Vercel and CORS is properly configured on Render.
+- **Render-এ ডাটাবেস এরর (Database Errors on Render)**: নিশ্চিত করুন যে আপনি আপনার বিল্ড কমান্ডে `prisma generate` রান করেছেন, এবং যদি আপনার স্কিমা পরিবর্তনের (schema changes) প্রয়োজন হয়, তাহলে আপনার ডেপ্লয় স্ক্রিপ্টের অংশ হিসেবে `npx prisma db push` রান করার বিষয়টি বিবেচনা করুন অথবা প্রোডাকশন ডাটাবেসে কানেক্ট করে লোকালি এটি ম্যানুয়ালি রান করুন।
+- **ফ্রন্টএন্ড ডাটা ফেচ (fetch) করছে না**: ব্রাউজারের ডেভেলপার টুলস (F12) খুলুন -> Network ট্যাবে যান। রিকোয়েস্টগুলো ফেইল করছে কিনা তা পরীক্ষা করুন। নিশ্চিত করুন যে Vercel-এ `VITE_API_URL` সঠিকভাবে সেট করা হয়েছে এবং Render-এ CORS যথাযথভাবে কনফিগার করা হয়েছে।

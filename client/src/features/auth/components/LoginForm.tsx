@@ -111,7 +111,7 @@ const LoginForm: React.FC = () => {
           type="email"
           placeholder={t('auth.login.emailPlaceholder')}
           value={email}
-          onChange={(e) => { setEmail(e.target.value); if (errors.email) setErrors((p) => ({ ...p, email: undefined })); }}
+          onChange={(e) => { setEmail(e.target.value); if (errors.email) setErrors((p) => { const { email: _, ...r } = p; return r; }); }}
           error={errors.email}
           autoComplete="email"
           disabled={isLoading}
@@ -121,7 +121,7 @@ const LoginForm: React.FC = () => {
           label={t('auth.login.passwordLabel')}
           placeholder={t('auth.login.passwordPlaceholder')}
           value={password}
-          onChange={(e) => { setPassword(e.target.value); if (errors.password) setErrors((p) => ({ ...p, password: undefined })); }}
+          onChange={(e) => { setPassword(e.target.value); if (errors.password) setErrors((p) => { const { password: _, ...r } = p; return r; }); }}
           error={errors.password}
           autoComplete="current-password"
           disabled={isLoading}

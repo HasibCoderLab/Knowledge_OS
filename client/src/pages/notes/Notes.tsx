@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FileText, Plus, AlertTriangle } from 'lucide-react';
-import { mockApi } from '../../services/mocks/mockApi';
+import { notesService } from '../../features/notes/notesService';
 import NoteCard from '../../features/notes/components/NoteCard';
 import NoteListItem from '../../features/notes/components/NoteListItem';
 import NoteFilters from '../../features/notes/components/NoteFilters';
@@ -31,7 +31,7 @@ export const Notes: React.FC = () => {
 
   const { data, isLoading } = useQuery({
     queryKey: ['notes'],
-    queryFn: mockApi.getNotes,
+    queryFn: notesService.getAll,
   });
 
   const notes = data?.data ?? [];
@@ -74,7 +74,7 @@ export const Notes: React.FC = () => {
 
   const handleCreate = useCallback(async (formData: NoteFormData) => {
     setIsSaving(true);
-    await mockApi.createNote({
+    await notesService.create({
       title: formData.title,
       content: formData.content,
       tags: formData.tags,
@@ -89,7 +89,7 @@ export const Notes: React.FC = () => {
   const handleUpdate = useCallback(async (formData: NoteFormData) => {
     if (!editingNote) return;
     setIsSaving(true);
-    await mockApi.updateNote(editingNote.id, {
+    await notesService.update(editingNote.id, {
       title: formData.title,
       content: formData.content,
       tags: formData.tags,
@@ -101,18 +101,18 @@ export const Notes: React.FC = () => {
 
   const handleDelete = useCallback(async () => {
     if (!deletingNote) return;
-    await mockApi.deleteNote(deletingNote.id);
+    await notesService.delete(deletingNote.id);
     setDeletingNote(null);
     invalidateNotes();
   }, [deletingNote, invalidateNotes]);
 
   const handleTogglePin = useCallback(async (note: Note) => {
-    await mockApi.togglePinNote(note.id);
+    await notesService.togglePin(note.id);
     invalidateNotes();
   }, [invalidateNotes]);
 
   const handleToggleFavorite = useCallback(async (note: Note) => {
-    await mockApi.toggleFavoriteNote(note.id);
+    await notesService.toggleFavorite(note.id);
     invalidateNotes();
   }, [invalidateNotes]);
 

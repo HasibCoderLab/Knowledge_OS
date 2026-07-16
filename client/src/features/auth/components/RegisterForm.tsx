@@ -69,7 +69,11 @@ const RegisterForm: React.FC = () => {
   };
 
   const clearFieldError = (field: keyof FormErrors) => {
-    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
+    if (errors[field]) setErrors((prev) => {
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

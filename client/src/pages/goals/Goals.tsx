@@ -2,7 +2,7 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Target, Plus, AlertTriangle } from 'lucide-react';
-import { mockApi } from '../../services/mocks/mockApi';
+import { goalsApi } from '../../services/api/index';
 import GoalCard from '../../features/goals/components/GoalCard';
 import GoalFilters from '../../features/goals/components/GoalFilters';
 import GoalForm from '../../features/goals/components/GoalForm';
@@ -12,6 +12,18 @@ import Button from '../../components/ui/Button';
 import Modal from '../../components/ui/Modal';
 import Skeleton from '../../components/ui/Skeleton';
 import type { Goal } from '../../types';
+
+const STATUS_MAP: Record<string, string> = {
+  active: 'IN_PROGRESS',
+  completed: 'COMPLETED',
+  failed: 'COMPLETED',
+};
+
+const STATUS_REVERSE: Record<string, string> = {
+  NOT_STARTED: 'active',
+  IN_PROGRESS: 'active',
+  COMPLETED: 'completed',
+};
 
 const filterOptions = [
   { value: 'all', label: 'All' },
@@ -39,10 +51,15 @@ export const Goals: React.FC = () => {
 
   const { data, isLoading } = useQuery({
     queryKey: ['goals'],
-    queryFn: mockApi.getGoals,
+    queryFn: () => goalsApi.getAll({ limit: 1000 }),
   });
 
-  const goals = data?.data ?? [];
+  const goals: Goal[] = (data?.data ?? []).map((g: Record<string, unknown>) => ({
+    ...g,
+    status: STATUS_REVERSE[g.status as string] || 'active',
+    type: g.type as Goal['type'],
+    priority: g.priority as Goal['priority'],
+  })) as Goal[];
 
   const invalidate = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: ['goals'] });
@@ -69,7 +86,16 @@ export const Goals: React.FC = () => {
 
   const handleCreate = useCallback(async (formData: GoalFormData) => {
     setIsSaving(true);
-    await mockApi.createGoal(formData);
+    await goalsApi.create({
+      title: formData.title,
+      description: formData.description,
+      category: formData.type,
+      targetDate: formData.deadline,
+      status: STATUS_MAP[formData.status] || 'IN_PROGRESS',
+      priority: formData.priority,
+      currentValue: formData.progress,
+      targetValue: 100,
+    });
     setIsSaving(false);
     setIsCreating(false);
     invalidate();
@@ -78,7 +104,16 @@ export const Goals: React.FC = () => {
   const handleUpdate = useCallback(async (formData: GoalFormData) => {
     if (!editingGoal) return;
     setIsSaving(true);
-    await mockApi.updateGoal(editingGoal.id, formData);
+    await goalsApi.update(editingGoal.id, {
+      title: formData.title,
+      description: formData.description,
+      category: formData.type,
+      targetDate: formData.deadline,
+      status: STATUS_MAP[formData.status] || 'IN_PROGRESS',
+      priority: formData.priority,
+      currentValue: formData.progress,
+      targetValue: 100,
+    });
     setIsSaving(false);
     setEditingGoal(null);
     invalidate();
@@ -86,7 +121,7 @@ export const Goals: React.FC = () => {
 
   const handleDelete = useCallback(async () => {
     if (!deletingGoal) return;
-    await mockApi.deleteGoal(deletingGoal.id);
+    await goalsApi.delete(deletingGoal.id);
     setDeletingGoal(null);
     invalidate();
   }, [deletingGoal, invalidate]);

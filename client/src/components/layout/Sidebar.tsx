@@ -157,6 +157,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 </a>
               );
             }
+            if (!item.path) return null;
             return (
               <NavLink
                 key={item.path}

@@ -5,13 +5,13 @@ import {
   BookOpen, Flame, Target, BookMarked, Search, Lightbulb, BrainCircuit,
   Clock, CheckSquare, Zap, Sparkles, Star, Award, TrendingUp, CalendarDays,
 } from 'lucide-react';
-import { mockApi } from '../../services/mocks/mockApi';
-import { USER_CREATION_DATE } from '../../services/mocks/mockData';
+import { readingApi, tasksApi, journalApi } from '../../services/api/index';
+import { calendarData, USER_CREATION_DATE } from '../../features/calendar/calendarData';
 import type {
   TimelineEntry, TimelineMilestone, DailySummaryData,
   AchievementMilestone, TimelineInsight, ProductivityScoreData,
   CalendarSuggestion,
-} from '../../services/mocks/mockData';
+} from '../../features/calendar/calendarData';
 import Card from '../../components/ui/Card';
 import Badge from '../../components/ui/Badge';
 import Skeleton from '../../components/ui/Skeleton';
@@ -127,21 +127,21 @@ export const CalendarPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const q = {
-    entries: useQuery({ queryKey: ['timelineEntries'], queryFn: mockApi.getTimelineEntries }),
-    firstEvents: useQuery({ queryKey: ['firstEvents'], queryFn: mockApi.getFirstEventMilestones }),
-    achievements: useQuery({ queryKey: ['achievements'], queryFn: mockApi.getAchievementMilestones }),
-    summaries: useQuery({ queryKey: ['dailySummaries'], queryFn: mockApi.getDailySummaries }),
-    weekly: useQuery({ queryKey: ['weeklyReviews'], queryFn: mockApi.getWeeklyReviews }),
-    monthly: useQuery({ queryKey: ['monthlyReviews'], queryFn: mockApi.getMonthlyReviews }),
-    yearly: useQuery({ queryKey: ['yearlyReview'], queryFn: mockApi.getYearlyReview }),
-    score: useQuery({ queryKey: ['productivityScore'], queryFn: mockApi.getProductivityScore }),
-    insights: useQuery({ queryKey: ['timelineInsights'], queryFn: mockApi.getTimelineInsights }),
-    suggestions: useQuery({ queryKey: ['calendarSuggestions'], queryFn: mockApi.getCalendarSuggestions }),
-    heatmap: useQuery({ queryKey: ['heatmap'], queryFn: mockApi.getHeatmapData }),
-    moods: useQuery({ queryKey: ['calendarMoods'], queryFn: mockApi.getCalendarMoods }),
-    reading: useQuery({ queryKey: ['readingSessions'], queryFn: mockApi.getReadingSessions }),
-    tasks: useQuery({ queryKey: ['tasks'], queryFn: mockApi.getTasks }),
-    journal: useQuery({ queryKey: ['journal'], queryFn: mockApi.getJournalEntries }),
+    entries: useQuery({ queryKey: ['timelineEntries'], queryFn: calendarData.getTimelineEntries }),
+    firstEvents: useQuery({ queryKey: ['firstEvents'], queryFn: calendarData.getFirstEventMilestones }),
+    achievements: useQuery({ queryKey: ['achievements'], queryFn: calendarData.getAchievementMilestones }),
+    summaries: useQuery({ queryKey: ['dailySummaries'], queryFn: calendarData.getDailySummaries }),
+    weekly: useQuery({ queryKey: ['weeklyReviews'], queryFn: calendarData.getWeeklyReviews }),
+    monthly: useQuery({ queryKey: ['monthlyReviews'], queryFn: calendarData.getMonthlyReviews }),
+    yearly: useQuery({ queryKey: ['yearlyReview'], queryFn: calendarData.getYearlyReview }),
+    score: useQuery({ queryKey: ['productivityScore'], queryFn: calendarData.getProductivityScore }),
+    insights: useQuery({ queryKey: ['timelineInsights'], queryFn: calendarData.getTimelineInsights }),
+    suggestions: useQuery({ queryKey: ['calendarSuggestions'], queryFn: calendarData.getCalendarSuggestions }),
+    heatmap: useQuery({ queryKey: ['heatmap'], queryFn: calendarData.getHeatmapData }),
+    moods: useQuery({ queryKey: ['calendarMoods'], queryFn: calendarData.getCalendarMoods }),
+    reading: useQuery({ queryKey: ['readingSessions'], queryFn: () => readingApi.getAll({ limit: 1000 }) }),
+    tasks: useQuery({ queryKey: ['tasks'], queryFn: () => tasksApi.getAll({ limit: 1000 }) }),
+    journal: useQuery({ queryKey: ['journal'], queryFn: () => journalApi.getAll({ limit: 1000 }) }),
   };
 
   const loading = Object.values(q).some(x => x.isLoading);
@@ -158,7 +158,7 @@ export const CalendarPage: React.FC = () => {
   const suggestions = q.suggestions.data?.data ?? [];
   const heatmap = q.heatmap.data?.data ?? [];
   const moods = q.moods.data?.data ?? [];
-  const tasks = q.tasks.data?.data ?? [];
+  const tasks = (q.tasks.data?.data ?? []) as Array<{ isCompleted: boolean }>;
 
   const todayMood = moods.find(m => m.date === todayStr);
 

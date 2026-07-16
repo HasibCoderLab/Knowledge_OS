@@ -2,12 +2,13 @@ import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { BookMarked, Plus, PenLine, Flame, CalendarDays, Quote, BookHeart } from 'lucide-react';
-import { mockApi } from '../../services/mocks/mockApi';
+import { journalApi } from '../../services/api/index';
 import JournalCard from '../../features/journal/components/JournalCard';
 import JournalFilters from '../../features/journal/components/JournalFilters';
 import EmptyState from '../../components/ui/EmptyState';
 import Button from '../../components/ui/Button';
 import Skeleton from '../../components/ui/Skeleton';
+import type { JournalEntry } from '../../types';
 
 const filterOptions = [
   { value: 'all', label: 'All' },
@@ -27,10 +28,7 @@ const dailyQuotes = [
 
 const containerVariants = {
   hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.06 },
-  },
+  visible: { opacity: 1, transition: { staggerChildren: 0.06 } },
 };
 
 const today = new Date();
@@ -44,10 +42,10 @@ export const Journal: React.FC = () => {
 
   const { data, isLoading } = useQuery({
     queryKey: ['journal'],
-    queryFn: mockApi.getJournalEntries,
+    queryFn: () => journalApi.getAll({ limit: 1000 }).then((r) => r.data),
   });
 
-  const entries = data?.data ?? [];
+  const entries: JournalEntry[] = data ?? [];
 
   const stats = useMemo(() => {
     const total = entries.length;
@@ -70,7 +68,6 @@ export const Journal: React.FC = () => {
 
   const filteredEntries = useMemo(() => {
     let result = entries;
-
     if (activeFilter === 'pinned') {
       result = result.filter(e => e.tags.includes('pinned') || e.tags.includes('reflection'));
     } else if (activeFilter === 'personal') {
@@ -80,14 +77,10 @@ export const Journal: React.FC = () => {
     } else if (activeFilter === 'ideas') {
       result = result.filter(e => e.tags.some(t => ['planning', 'design', 'project', 'ideas'].includes(t)));
     }
-
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      result = result.filter(
-        e => e.title.toLowerCase().includes(q) || e.content.toLowerCase().includes(q) || e.tags.some(t => t.toLowerCase().includes(q))
-      );
+      result = result.filter(e => e.title.toLowerCase().includes(q) || e.content.toLowerCase().includes(q) || e.tags.some(t => t.toLowerCase().includes(q)));
     }
-
     return result;
   }, [entries, activeFilter, searchQuery]);
 
@@ -121,11 +114,7 @@ export const Journal: React.FC = () => {
         </div>
         <div className="space-y-4">
           <Skeleton className="h-11 w-full max-w-md rounded-xl" />
-          <div className="flex gap-2">
-            <Skeleton className="h-9 w-16 rounded-xl" />
-            <Skeleton className="h-9 w-24 rounded-xl" />
-            <Skeleton className="h-9 w-28 rounded-xl" />
-          </div>
+          <div className="flex gap-2"><Skeleton className="h-9 w-16 rounded-xl" /><Skeleton className="h-9 w-24 rounded-xl" /><Skeleton className="h-9 w-28 rounded-xl" /></div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {Array.from({ length: 6 }).map((_, i) => (
@@ -135,10 +124,7 @@ export const Journal: React.FC = () => {
               <Skeleton className="h-3 w-full" />
               <Skeleton className="h-3 w-full" />
               <Skeleton className="h-3 w-2/3" />
-              <div className="flex gap-1 pt-2">
-                <Skeleton className="h-5 w-12 rounded-full" />
-                <Skeleton className="h-5 w-16 rounded-full" />
-              </div>
+              <div className="flex gap-1 pt-2"><Skeleton className="h-5 w-12 rounded-full" /><Skeleton className="h-5 w-16 rounded-full" /></div>
             </div>
           ))}
         </div>
@@ -147,42 +133,21 @@ export const Journal: React.FC = () => {
   }
 
   return (
-    <motion.div
-      initial="hidden"
-      animate="visible"
-      variants={containerVariants}
-      className="space-y-8"
-    >
-      {/* Header */}
+    <motion.div initial="hidden" animate="visible" variants={containerVariants} className="space-y-8">
       <motion.header
-        variants={{
-          hidden: { opacity: 0, y: -10 },
-          visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' as const } },
-        }}
+        variants={{ hidden: { opacity: 0, y: -10 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' as const } } }}
         className="flex flex-col md:flex-row md:items-end justify-between gap-4"
       >
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 mb-1">
-            Personal Journal
-          </p>
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
-            Journal
-          </h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5">
-            {entries.length} entries · {stats.thisMonth} this month
-          </p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 mb-1">Personal Journal</p>
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">Journal</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5">{entries.length} entries · {stats.thisMonth} this month</p>
         </div>
-        <Button size="sm" className="gap-2 shrink-0">
-          <Plus size={16} /> New Entry
-        </Button>
+        <Button size="sm" className="gap-2 shrink-0"><Plus size={16} /> New Entry</Button>
       </motion.header>
 
-      {/* Daily Quote */}
       <motion.div
-        variants={{
-          hidden: { opacity: 0, y: 8 },
-          visible: { opacity: 1, y: 0, transition: { duration: 0.35, delay: 0.05 } },
-        }}
+        variants={{ hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: 0.35, delay: 0.05 } } }}
         className="bg-gradient-to-br from-indigo-600/5 to-indigo-600/10 dark:from-indigo-500/5 dark:to-indigo-500/10 border border-indigo-200/50 dark:border-indigo-800/30 rounded-2xl p-5 md:p-6"
       >
         <div className="flex items-start gap-4">
@@ -194,45 +159,33 @@ export const Journal: React.FC = () => {
         </div>
       </motion.div>
 
-      {/* Stats Row */}
       <motion.div
-        variants={{
-          hidden: { opacity: 0, y: 8 },
-          visible: { opacity: 1, y: 0, transition: { duration: 0.35, delay: 0.08 } },
-        }}
+        variants={{ hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: 0.35, delay: 0.08 } } }}
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
       >
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex items-center gap-4">
-          <div className="p-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400">
-            <BookMarked size={17} strokeWidth={2} />
-          </div>
+          <div className="p-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400"><BookMarked size={17} strokeWidth={2} /></div>
           <div>
             <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Total Entries</p>
             <p className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white tabular-nums mt-0.5">{stats.total}</p>
           </div>
         </div>
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex items-center gap-4">
-          <div className="p-2.5 rounded-xl bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400">
-            <Flame size={17} strokeWidth={2} />
-          </div>
+          <div className="p-2.5 rounded-xl bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400"><Flame size={17} strokeWidth={2} /></div>
           <div>
             <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Writing Streak</p>
             <p className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white tabular-nums mt-0.5">{stats.streak} days</p>
           </div>
         </div>
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex items-center gap-4">
-          <div className="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400">
-            <PenLine size={17} strokeWidth={2} />
-          </div>
+          <div className="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"><PenLine size={17} strokeWidth={2} /></div>
           <div>
             <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">This Month</p>
             <p className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white tabular-nums mt-0.5">{stats.thisMonth}</p>
           </div>
         </div>
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex items-center gap-4">
-          <div className="p-2.5 rounded-xl bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400">
-            <BookHeart size={17} strokeWidth={2} />
-          </div>
+          <div className="p-2.5 rounded-xl bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400"><BookHeart size={17} strokeWidth={2} /></div>
           <div>
             <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Categories</p>
             <p className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white tabular-nums mt-0.5">{stats.categories}</p>
@@ -240,47 +193,24 @@ export const Journal: React.FC = () => {
         </div>
       </motion.div>
 
-      {/* Search + Filters */}
-      <motion.div
-        variants={{
-          hidden: { opacity: 0, y: -8 },
-          visible: { opacity: 1, y: 0, transition: { duration: 0.35, delay: 0.1, ease: 'easeOut' as const } },
-        }}
-      >
+      <motion.div variants={{ hidden: { opacity: 0, y: -8 }, visible: { opacity: 1, y: 0, transition: { duration: 0.35, delay: 0.1, ease: 'easeOut' as const } } }}>
         <JournalFilters
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          activeFilter={activeFilter}
-          onFilterChange={setActiveFilter}
+          searchQuery={searchQuery} onSearchChange={setSearchQuery}
+          activeFilter={activeFilter} onFilterChange={setActiveFilter}
           filterOptions={filterOptionsWithCounts}
         />
       </motion.div>
 
-      {/* Entries Grid */}
       {filteredEntries.length === 0 ? (
-        <motion.div
-          variants={{
-            hidden: { opacity: 0, y: 10 },
-            visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
-          }}
-        >
+        <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0, transition: { duration: 0.3 } } }}>
           {searchQuery || activeFilter !== 'all' ? (
             <EmptyState icon={BookMarked} title="No entries found" description="Try a different search or filter" />
           ) : (
-            <EmptyState
-              icon={BookMarked}
-              title="No entries yet"
-              description="Write your first journal entry to start reflecting"
-              actionLabel="New Entry"
-              onAction={() => {}}
-            />
+            <EmptyState icon={BookMarked} title="No entries yet" description="Write your first journal entry to start reflecting" actionLabel="New Entry" onAction={() => {}} />
           )}
         </motion.div>
       ) : (
-        <motion.div
-          variants={containerVariants}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"
-        >
+        <motion.div variants={containerVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {filteredEntries.map((entry, index) => (
             <JournalCard key={entry.id} entry={entry} index={index} />
           ))}

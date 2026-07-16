@@ -1,7 +1,14 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { BrainCircuit, TrendingUp, TrendingDown, Minus, Lightbulb } from 'lucide-react';
-import type { AIInsight } from '../../../services/mocks/mockData';
+
+interface AIInsight {
+  id: string;
+  type: 'productivity' | 'reading' | 'learning' | 'focus';
+  message: string;
+  trend: 'up' | 'down' | 'neutral';
+  percentage?: number;
+}
 
 interface InsightCardProps {
   insight: AIInsight;

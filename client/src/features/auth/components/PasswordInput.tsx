@@ -3,7 +3,7 @@ import { Eye, EyeOff } from 'lucide-react';
 
 interface PasswordInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
   label?: string;
-  error?: string;
+  error?: string | undefined;
 }
 
 const PasswordInput: React.FC<PasswordInputProps> = ({ label, error, className = '', ...props }) => {

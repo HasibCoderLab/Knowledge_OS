@@ -1,8 +1,9 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { BookOpen, Target, Zap, Flame, ArrowUpRight, Plus, FileText, Lightbulb } from 'lucide-react';
-import { mockApi } from '../../services/mocks/mockApi';
+import { libraryApi, habitsApi, goalsApi } from '../../services/api/index';
 import StatCard from '../../features/dashboard/components/StatCard';
+import type { Book, Goal } from '../../types';
 import ReadingProgressCard from '../../features/dashboard/components/ReadingProgressCard';
 import HabitChecklist from '../../features/dashboard/components/HabitChecklist';
 import Card from '../../components/ui/Card';
@@ -12,15 +13,15 @@ import Badge from '../../components/ui/Badge';
 export const Dashboard: React.FC = () => {
   const { data: books, isLoading: booksLoading } = useQuery({
     queryKey: ['books'],
-    queryFn: mockApi.getBooks,
+    queryFn: () => libraryApi.getAll({ limit: 1000 }),
   });
   const { data: habits, isLoading: habitsLoading } = useQuery({
     queryKey: ['habits'],
-    queryFn: mockApi.getHabits,
+    queryFn: () => habitsApi.getAll({ limit: 1000 }),
   });
   const { data: goals, isLoading: goalsLoading } = useQuery({
     queryKey: ['goals'],
-    queryFn: mockApi.getGoals,
+    queryFn: () => goalsApi.getAll({ limit: 1000 }),
   });
 
   if (booksLoading || habitsLoading || goalsLoading) {
@@ -34,7 +35,7 @@ export const Dashboard: React.FC = () => {
     );
   }
 
-  const currentBook = books?.data?.find((b) => b.status === 'reading') || books?.data?.[0];
+  const currentBook = (books?.data as Book[] | undefined)?.find((b) => b.status === 'reading') || (books?.data as Book[] | undefined)?.[0];
 
   return (
     <div className="space-y-6 md:space-y-8 lg:space-y-10">
@@ -122,7 +123,7 @@ export const Dashboard: React.FC = () => {
               </Button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {goals?.data?.map((goal) => (
+              {(goals?.data as Goal[] | undefined)?.map((goal) => (
                 <Card key={goal.id} hoverable className="p-4 group">
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex items-center gap-2 min-w-0">

@@ -6,7 +6,7 @@ import {
   BrainCircuit, Lightbulb, Search, Zap, Flame,
   PieChart as PieIcon, Radar as RadarIcon,
 } from 'lucide-react';
-import { mockApi } from '../../services/mocks/mockApi';
+import { journalApi, tasksApi, habitsApi, goalsApi } from '../../services/api/index';
 import AreaChart from '../../features/charts/AreaChart';
 import BarChart from '../../features/charts/BarChart';
 import StackedBarChart from '../../features/charts/StackedBarChart';
@@ -30,46 +30,77 @@ const itemVariants: Variants = {
 
 type TimeRange = 'weekly' | 'monthly' | 'yearly';
 
+interface AnalyticsDataPoint { date: string; value: number }
+interface AnalyticsCategory { name: string; value: number; color: string }
+interface AIInsight { id: string; type: 'productivity' | 'reading' | 'learning' | 'focus'; message: string; trend: 'up' | 'down' | 'neutral'; percentage?: number }
+interface RadarMetric { category: string; value: number; fullMark: number }
+interface KnowledgeScoreBreakdown { label: string; score: number; maxScore: number }
+interface WeeklyReport { week: string; journalEntries: number; readingHours: number; tasksCompleted: number; focusHours: number }
+interface MonthlyReport { month: string; entries: number; booksFinished: number; pagesRead: number; avgFocusHours: number }
+
+const MOCK_DAILY_ACTIVITY: AnalyticsDataPoint[] = [
+  { date: 'Mon', value: 12 }, { date: 'Tue', value: 18 }, { date: 'Wed', value: 8 },
+  { date: 'Thu', value: 22 }, { date: 'Fri', value: 15 }, { date: 'Sat', value: 10 }, { date: 'Sun', value: 20 },
+];
+const MOCK_READING_TREND: AnalyticsDataPoint[] = [
+  { date: 'W1', value: 120 }, { date: 'W2', value: 180 }, { date: 'W3', value: 95 },
+  { date: 'W4', value: 210 }, { date: 'W5', value: 150 }, { date: 'W6', value: 240 },
+];
+const MOCK_KNOWLEDGE_GROWTH: AnalyticsDataPoint[] = [
+  { date: 'Jan', value: 50 }, { date: 'Feb', value: 85 }, { date: 'Mar', value: 120 },
+  { date: 'Apr', value: 170 }, { date: 'May', value: 210 }, { date: 'Jun', value: 280 },
+];
+const MOCK_FOCUS_HOURS: AnalyticsDataPoint[] = [
+  { date: 'W1', value: 8 }, { date: 'W2', value: 12 }, { date: 'W3', value: 6 },
+  { date: 'W4', value: 15 }, { date: 'W5', value: 10 }, { date: 'W6', value: 18 },
+];
+const MOCK_CATEGORIES: AnalyticsCategory[] = [
+  { name: 'Reading', value: 35, color: 'bg-indigo-500' },
+  { name: 'Journal', value: 25, color: 'bg-emerald-500' },
+  { name: 'Tasks', value: 22, color: 'bg-amber-500' },
+  { name: 'Focus', value: 18, color: 'bg-blue-500' },
+];
+
 export const Analytics: React.FC = () => {
   const [timeRange, setTimeRange] = useState<TimeRange>('weekly');
   const [searchQuery, setSearchQuery] = useState('');
 
   const queries = {
-    activity: useQuery({ queryKey: ['dailyActivity'], queryFn: mockApi.getDailyActivity }),
-    reading: useQuery({ queryKey: ['readingTrend'], queryFn: mockApi.getReadingTrend }),
-    knowledge: useQuery({ queryKey: ['knowledgeGrowth'], queryFn: mockApi.getKnowledgeGrowth }),
-    focus: useQuery({ queryKey: ['focusHours'], queryFn: mockApi.getFocusHours }),
-    categories: useQuery({ queryKey: ['categoryDistribution'], queryFn: mockApi.getCategoryDistribution }),
-    weekly: useQuery({ queryKey: ['weeklyReports'], queryFn: mockApi.getWeeklyReports }),
-    monthly: useQuery({ queryKey: ['monthlyReports'], queryFn: mockApi.getMonthlyReports }),
-    insights: useQuery({ queryKey: ['insights'], queryFn: mockApi.getAIInsights }),
-    radar: useQuery({ queryKey: ['radarData'], queryFn: mockApi.getRadarData }),
-    knowledgeScore: useQuery({ queryKey: ['knowledgeScore'], queryFn: mockApi.getKnowledgeScore }),
-    learningHeatmap: useQuery({ queryKey: ['learningHeatmap'], queryFn: mockApi.getLearningHeatmap }),
-    heatmap: useQuery({ queryKey: ['heatmap'], queryFn: mockApi.getHeatmapData }),
-    journal: useQuery({ queryKey: ['journal'], queryFn: mockApi.getJournalEntries }),
-    tasks: useQuery({ queryKey: ['tasks'], queryFn: mockApi.getTasks }),
-    habits: useQuery({ queryKey: ['habits'], queryFn: mockApi.getHabits }),
-    goals: useQuery({ queryKey: ['goals'], queryFn: mockApi.getGoals }),
+    activity: useQuery({ queryKey: ['dailyActivity'], queryFn: () => ({ data: MOCK_DAILY_ACTIVITY }) }),
+    reading: useQuery({ queryKey: ['readingTrend'], queryFn: () => ({ data: MOCK_READING_TREND }) }),
+    knowledge: useQuery({ queryKey: ['knowledgeGrowth'], queryFn: () => ({ data: MOCK_KNOWLEDGE_GROWTH }) }),
+    focus: useQuery({ queryKey: ['focusHours'], queryFn: () => ({ data: MOCK_FOCUS_HOURS }) }),
+    categories: useQuery({ queryKey: ['categoryDistribution'], queryFn: () => ({ data: MOCK_CATEGORIES }) }),
+    weekly: useQuery({ queryKey: ['weeklyReports'], queryFn: () => ({ data: [] as WeeklyReport[] }) }),
+    monthly: useQuery({ queryKey: ['monthlyReports'], queryFn: () => ({ data: [] as MonthlyReport[] }) }),
+    insights: useQuery({ queryKey: ['insights'], queryFn: () => ({ data: [] as AIInsight[] }) }),
+    radar: useQuery({ queryKey: ['radarData'], queryFn: () => ({ data: [] as RadarMetric[] }) }),
+    knowledgeScore: useQuery({ queryKey: ['knowledgeScore'], queryFn: () => ({ data: [] as KnowledgeScoreBreakdown[] }) }),
+    learningHeatmap: useQuery({ queryKey: ['learningHeatmap'], queryFn: () => ({ data: [] }) }),
+    heatmap: useQuery({ queryKey: ['heatmap'], queryFn: () => ({ data: [] }) }),
+    journal: useQuery({ queryKey: ['journal'], queryFn: () => journalApi.getAll({ limit: 1000 }) }),
+    tasks: useQuery({ queryKey: ['tasks'], queryFn: () => tasksApi.getAll({ limit: 1000 }) }),
+    habits: useQuery({ queryKey: ['habits'], queryFn: () => habitsApi.getAll({ limit: 1000 }) }),
+    goals: useQuery({ queryKey: ['goals'], queryFn: () => goalsApi.getAll({ limit: 1000 }) }),
   };
 
   const isLoading = Object.values(queries).some(q => q.isLoading);
 
-  const activity = queries.activity.data?.data ?? [];
-  const reading = queries.reading.data?.data ?? [];
-  const knowledge = queries.knowledge.data?.data ?? [];
-  const focus = queries.focus.data?.data ?? [];
-  const categories = queries.categories.data?.data ?? [];
-  const insights = queries.insights.data?.data ?? [];
-  const weeklyReports = queries.weekly.data?.data ?? [];
-  const monthlyReports = queries.monthly.data?.data ?? [];
-  const radarData = queries.radar.data?.data ?? [];
-  const knowledgeScore = queries.knowledgeScore.data?.data ?? [];
+  const activity: AnalyticsDataPoint[] = queries.activity.data?.data ?? [];
+  const reading: AnalyticsDataPoint[] = queries.reading.data?.data ?? [];
+  const knowledge: AnalyticsDataPoint[] = queries.knowledge.data?.data ?? [];
+  const focus: AnalyticsDataPoint[] = queries.focus.data?.data ?? [];
+  const categories: AnalyticsCategory[] = queries.categories.data?.data ?? [];
+  const insights: AIInsight[] = queries.insights.data?.data ?? [];
+  const weeklyReports: WeeklyReport[] = queries.weekly.data?.data ?? [];
+  const monthlyReports: MonthlyReport[] = queries.monthly.data?.data ?? [];
+  const radarData: RadarMetric[] = queries.radar.data?.data ?? [];
+  const knowledgeScore: KnowledgeScoreBreakdown[] = queries.knowledgeScore.data?.data ?? [];
   const learningHeatmap = queries.learningHeatmap.data?.data ?? [];
   const heatmapData = queries.heatmap.data?.data ?? [];
   const journalEntries = queries.journal.data?.data ?? [];
-  const tasks = queries.tasks.data?.data ?? [];
-  const habits = queries.habits.data?.data ?? [];
+  const tasks: Array<{ isCompleted: boolean; streak?: number }> = queries.tasks.data?.data ?? [];
+  const habits: Array<{ streak: number }> = queries.habits.data?.data ?? [];
   const goals = queries.goals.data?.data ?? [];
 
   const totalActions = activity.reduce((sum, d) => sum + d.value, 0);

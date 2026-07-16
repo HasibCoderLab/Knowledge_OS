@@ -2,7 +2,7 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { CheckSquare, Plus, Flame, Zap, Trophy, AlertTriangle } from 'lucide-react';
-import { mockApi } from '../../services/mocks/mockApi';
+import { habitsApi } from '../../services/api/index';
 import HabitCard from '../../features/habits/components/HabitCard';
 import HabitFilters from '../../features/habits/components/HabitFilters';
 import HabitForm from '../../features/habits/components/HabitForm';
@@ -38,16 +38,27 @@ export const Habits: React.FC = () => {
 
   const { data, isLoading: habitsLoading } = useQuery({
     queryKey: ['habits'],
-    queryFn: mockApi.getHabits,
+    queryFn: () => habitsApi.getAll({ limit: 1000 }),
   });
 
-  const { data: statsData, isLoading: statsLoading } = useQuery({
-    queryKey: ['habitStats'],
-    queryFn: mockApi.getHabitStats,
-  });
+  const rawHabits = data?.data ?? [];
 
-  const habits = data?.data ?? [];
-  const stats = statsData?.data;
+  const habits: Habit[] = rawHabits.map((h: Record<string, unknown>) => ({
+    id: h.id as string,
+    name: h.name as string,
+    description: h.description as string | undefined,
+    frequency: h.frequency as 'daily' | 'weekly',
+    streak: (h.currentStreak as number) || 0,
+    completedToday: false,
+    logs: [],
+    createdAt: h.createdAt as string,
+  }));
+
+  const stats = {
+    totalCompletions: rawHabits.reduce((sum: number, h: Record<string, unknown>) => sum + ((h.currentStreak as number) || 0), 0),
+    currentStreak: Math.max(0, ...rawHabits.map((h: Record<string, unknown>) => (h.currentStreak as number) || 0)),
+    longestStreak: Math.max(0, ...rawHabits.map((h: Record<string, unknown>) => (h.longestStreak as number) || 0)),
+  };
 
   const invalidate = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: ['habits'] });
@@ -77,7 +88,7 @@ export const Habits: React.FC = () => {
 
   const handleCreate = useCallback(async (formData: HabitFormData) => {
     setIsSaving(true);
-    await mockApi.createHabit(formData);
+    await habitsApi.create(formData as unknown as Record<string, unknown>);
     setIsSaving(false);
     setIsCreating(false);
     invalidate();
@@ -86,7 +97,7 @@ export const Habits: React.FC = () => {
   const handleUpdate = useCallback(async (formData: HabitFormData) => {
     if (!editingHabit) return;
     setIsSaving(true);
-    await mockApi.updateHabit(editingHabit.id, formData);
+    await habitsApi.update(editingHabit.id, formData as unknown as Record<string, unknown>);
     setIsSaving(false);
     setEditingHabit(null);
     invalidate();
@@ -94,17 +105,20 @@ export const Habits: React.FC = () => {
 
   const handleDelete = useCallback(async () => {
     if (!deletingHabit) return;
-    await mockApi.deleteHabit(deletingHabit.id);
+    await habitsApi.delete(deletingHabit.id);
     setDeletingHabit(null);
     invalidate();
   }, [deletingHabit, invalidate]);
 
   const handleToggle = useCallback(async (habit: Habit) => {
-    await mockApi.toggleHabitCompletion(habit.id);
+    await habitsApi.log(habit.id, {
+      date: new Date().toISOString(),
+      completed: true,
+    });
     invalidate();
   }, [invalidate]);
 
-  const isLoading = habitsLoading || statsLoading;
+  const isLoading = habitsLoading;
 
   if (isLoading) {
     return (
