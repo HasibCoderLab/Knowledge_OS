@@ -9,6 +9,7 @@ export interface AuthUser {
   avatar?: string;
   username?: string;
   bio?: string;
+  location?: string;
   createdAt?: string;
   theme?: string;
   language?: string;

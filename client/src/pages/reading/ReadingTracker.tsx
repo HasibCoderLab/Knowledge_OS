@@ -15,6 +15,7 @@ import Modal from '../../components/ui/Modal';
 import BookForm from '../../features/library/components/BookForm';
 import ReadingSessionForm from '../../features/reading/components/ReadingSessionForm';
 import type { Book, ReadingSession } from '../../types';
+import { useToastStore } from '../../store/toastStore';
 import type { BookFormData } from '../../features/library/components/BookForm';
 import type { ReadingSessionFormData } from '../../features/reading/components/ReadingSessionForm';
 
@@ -203,22 +204,28 @@ export const ReadingTracker: React.FC = () => {
         <BookForm
           onSave={async (data: BookFormData) => {
             setIsSaving(true);
-            await libraryApi.create({
-              title: data.title,
-              author: data.author,
-              category: data.category,
-              coverUrl: data.coverUrl,
-              status: data.status,
-              totalPages: data.totalPages,
-              currentPage: data.currentPage,
-              startDate: data.startDate,
-              finishDate: data.finishDate,
-              rating: data.rating,
-              tags: data.tags,
-            });
-            setIsSaving(false);
-            setIsAddModalOpen(false);
-            invalidate([['books']]);
+            try {
+              await libraryApi.create({
+                title: data.title,
+                author: data.author,
+                category: data.category,
+                coverUrl: data.coverUrl,
+                status: data.status,
+                totalPages: data.totalPages,
+                currentPage: data.currentPage,
+                startDate: data.startDate,
+                finishDate: data.finishDate,
+                rating: data.rating,
+                tags: data.tags,
+              });
+              useToastStore.getState().addToast({ title: 'Book added', type: 'success' });
+              setIsAddModalOpen(false);
+              invalidate([['books']]);
+            } catch {
+              useToastStore.getState().addToast({ title: 'Failed to add book', description: 'Please try again', type: 'error' });
+            } finally {
+              setIsSaving(false);
+            }
           }}
           onCancel={() => setIsAddModalOpen(false)}
           isSaving={isSaving}
@@ -239,8 +246,11 @@ export const ReadingTracker: React.FC = () => {
                 startPage: data.startPage,
                 endPage: data.endPage,
               });
+              useToastStore.getState().addToast({ title: 'Reading session logged', type: 'success' });
               setIsSessionModalOpen(false);
               invalidate([['readingSessions'], ['books']]);
+            } catch {
+              useToastStore.getState().addToast({ title: 'Failed to log session', description: 'Please try again', type: 'error' });
             } finally {
               setIsSessionSaving(false);
             }

@@ -7,6 +7,7 @@ import NoteListItem from '../../features/notes/components/NoteListItem';
 import NoteFilters from '../../features/notes/components/NoteFilters';
 import NoteForm from '../../features/notes/components/NoteForm';
 import type { NoteFormData } from '../../features/notes/components/NoteForm';
+import { useToastStore } from '../../store/toastStore';
 import EmptyState from '../../components/ui/EmptyState';
 import Button from '../../components/ui/Button';
 import Modal from '../../components/ui/Modal';
@@ -74,46 +75,73 @@ export const Notes: React.FC = () => {
 
   const handleCreate = useCallback(async (formData: NoteFormData) => {
     setIsSaving(true);
-    await notesService.create({
-      title: formData.title,
-      content: formData.content,
-      tags: formData.tags,
-      isPinned: false,
-      isFavorite: false,
-    });
-    setIsSaving(false);
-    setIsCreating(false);
-    invalidateNotes();
+    try {
+      await notesService.create({
+        title: formData.title,
+        content: formData.content,
+        tags: formData.tags,
+        isPinned: false,
+        isFavorite: false,
+      });
+      useToastStore.getState().addToast({ title: 'Note created', type: 'success' });
+      setIsCreating(false);
+      invalidateNotes();
+    } catch {
+      useToastStore.getState().addToast({ title: 'Failed to create note', description: 'Please try again', type: 'error' });
+    } finally {
+      setIsSaving(false);
+    }
   }, [invalidateNotes]);
 
   const handleUpdate = useCallback(async (formData: NoteFormData) => {
     if (!editingNote) return;
     setIsSaving(true);
-    await notesService.update(editingNote.id, {
-      title: formData.title,
-      content: formData.content,
-      tags: formData.tags,
-    });
-    setIsSaving(false);
-    setEditingNote(null);
-    invalidateNotes();
+    try {
+      await notesService.update(editingNote.id, {
+        title: formData.title,
+        content: formData.content,
+        tags: formData.tags,
+      });
+      useToastStore.getState().addToast({ title: 'Note updated', type: 'success' });
+      setEditingNote(null);
+      invalidateNotes();
+    } catch {
+      useToastStore.getState().addToast({ title: 'Failed to update note', description: 'Please try again', type: 'error' });
+    } finally {
+      setIsSaving(false);
+    }
   }, [editingNote, invalidateNotes]);
 
   const handleDelete = useCallback(async () => {
     if (!deletingNote) return;
-    await notesService.delete(deletingNote.id);
-    setDeletingNote(null);
-    invalidateNotes();
+    try {
+      await notesService.delete(deletingNote.id);
+      useToastStore.getState().addToast({ title: 'Note deleted', type: 'success' });
+      setDeletingNote(null);
+      invalidateNotes();
+    } catch {
+      useToastStore.getState().addToast({ title: 'Failed to delete note', description: 'Please try again', type: 'error' });
+    }
   }, [deletingNote, invalidateNotes]);
 
   const handleTogglePin = useCallback(async (note: Note) => {
-    await notesService.togglePin(note.id);
-    invalidateNotes();
+    try {
+      await notesService.togglePin(note.id);
+      useToastStore.getState().addToast({ title: note.isPinned ? 'Note unpinned' : 'Note pinned', type: 'success' });
+      invalidateNotes();
+    } catch {
+      useToastStore.getState().addToast({ title: 'Failed to toggle pin', description: 'Please try again', type: 'error' });
+    }
   }, [invalidateNotes]);
 
   const handleToggleFavorite = useCallback(async (note: Note) => {
-    await notesService.toggleFavorite(note.id);
-    invalidateNotes();
+    try {
+      await notesService.toggleFavorite(note.id);
+      useToastStore.getState().addToast({ title: note.isFavorite ? 'Note unfavorited' : 'Note favorited', type: 'success' });
+      invalidateNotes();
+    } catch {
+      useToastStore.getState().addToast({ title: 'Failed to toggle favorite', description: 'Please try again', type: 'error' });
+    }
   }, [invalidateNotes]);
 
   if (isLoading) {

@@ -7,8 +7,8 @@ import {
   Target, CheckSquare, ListChecks, Flame, Activity,
   Settings, LogOut, Camera, Pencil, X, Save, Loader2,
 } from 'lucide-react';
-import { useAuthStore } from '../../store/authStore';
-import { libraryApi, readingApi, journalApi, goalsApi, tasksApi, habitsApi, settingsApi } from '../../services/api/index';
+import { useAuthStore, type AuthUser } from '../../store/authStore';
+import { libraryApi, readingApi, journalApi, goalsApi, tasksApi, habitsApi, settingsApi, type UserProfile } from '../../services/api/index';
 import Card from '../../components/ui/Card';
 import Avatar from '../../components/ui/Avatar';
 import Button from '../../components/ui/Button';
@@ -69,17 +69,11 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] as const } },
 };
 
-interface UserProfile {
-  id: string;
+interface UpdateProfileData {
   name: string;
-  username: string | null;
-  email: string;
-  avatar: string | null;
-  bio: string | null;
-  location: string | null;
-  theme: string;
-  language: string;
-  createdAt: string;
+  username: string;
+  bio: string;
+  location: string;
 }
 
 export const Profile: React.FC = () => {
@@ -117,13 +111,16 @@ export const Profile: React.FC = () => {
     queryFn: () => habitsApi.getAll({ limit: 1000 }),
   });
 
-  const { data: profileData, isLoading: profileLoading, refetch: refetchProfile } = useQuery({
+  const { data: profileData, isLoading: profileLoading, refetch: refetchProfile } = useQuery<UserProfile>({
     queryKey: ['profile'],
-    queryFn: () => settingsApi.get(),
+    queryFn: async () => {
+      const response = await settingsApi.get();
+      return response.data as UserProfile;
+    },
     enabled: !!authUser,
   });
 
-  const user = profileData?.data as UserProfile | undefined ?? authUser;
+  const user = profileData ?? authUser;
 
   const isLoading = booksLoading || sessionsLoading || journalLoading || goalsLoading || tasksLoading || habitsLoading || profileLoading;
 
@@ -150,18 +147,35 @@ export const Profile: React.FC = () => {
     };
   }, [booksData, sessionsData, journalData, goalsData, tasksData, habitsData]);
 
+interface UpdateProfileData {
+  name: string;
+  username: string;
+  bio: string;
+  location: string;
+  [key: string]: unknown;
+}
+
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editName, setEditName] = useState(user?.name ?? '');
   const [editUsername, setEditUsername] = useState(user?.username ?? '');
   const [editBio, setEditBio] = useState(user?.bio ?? '');
   const [editLocation, setEditLocation] = useState(user?.location ?? '');
 
-  const updateProfileMutation = useMutation({
-    mutationFn: (data: { name: string; username: string; bio: string; location: string }) =>
-      settingsApi.update(data),
-    onSuccess: (response) => {
-      const updatedUser = response.data as UserProfile;
-      updateUser(updatedUser);
+const updateProfileMutation = useMutation<UserProfile, Error, UpdateProfileData>({
+    mutationFn: async (data: UpdateProfileData) => {
+      const response = await settingsApi.update(data as Record<string, unknown>);
+      return response.data as UserProfile;
+    },
+    onSuccess: (updatedUser) => {
+      const updates: Partial<AuthUser> = {
+        name: updatedUser.name,
+      };
+      if (updatedUser.username !== null) updates.username = updatedUser.username;
+      if (updatedUser.bio !== null) updates.bio = updatedUser.bio;
+      if (updatedUser.location !== null) updates.location = updatedUser.location;
+      if (updatedUser.avatar !== null) updates.avatar = updatedUser.avatar;
+      
+      updateUser(updates);
       queryClient.invalidateQueries({ queryKey: ['profile'] });
       setEditModalOpen(false);
     },

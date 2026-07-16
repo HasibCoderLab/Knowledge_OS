@@ -6,6 +6,7 @@ import { tasksApi } from '../../services/api/index';
 import TaskItem from '../../features/tasks/components/TaskItem';
 import TaskFilters from '../../features/tasks/components/TaskFilters';
 import TaskForm from '../../features/tasks/components/TaskForm';
+import { useToastStore } from '../../store/toastStore';
 import type { TaskFormData } from '../../features/tasks/components/TaskForm';
 import EmptyState from '../../components/ui/EmptyState';
 import Button from '../../components/ui/Button';
@@ -80,34 +81,59 @@ export const Tasks: React.FC = () => {
 
   const handleCreate = useCallback(async (formData: TaskFormData) => {
     setIsSaving(true);
-    await tasksApi.create({
-      ...formData,
-      status: 'TODO',
-    } as unknown as Record<string, unknown>);
-    setIsSaving(false);
-    setIsCreating(false);
-    invalidate();
+    try {
+      await tasksApi.create({
+        ...formData,
+        status: 'TODO',
+      } as unknown as Record<string, unknown>);
+      useToastStore.getState().addToast({ title: 'Task created', type: 'success' });
+      setIsCreating(false);
+      invalidate();
+    } catch {
+      useToastStore.getState().addToast({ title: 'Failed to create task', description: 'Please try again', type: 'error' });
+    } finally {
+      setIsSaving(false);
+    }
   }, [invalidate]);
 
   const handleUpdate = useCallback(async (formData: TaskFormData) => {
     if (!editingTask) return;
     setIsSaving(true);
-    await tasksApi.update(editingTask.id, formData as unknown as Record<string, unknown>);
-    setIsSaving(false);
-    setEditingTask(null);
-    invalidate();
+    try {
+      await tasksApi.update(editingTask.id, formData as unknown as Record<string, unknown>);
+      useToastStore.getState().addToast({ title: 'Task updated', type: 'success' });
+      setEditingTask(null);
+      invalidate();
+    } catch {
+      useToastStore.getState().addToast({ title: 'Failed to update task', description: 'Please try again', type: 'error' });
+    } finally {
+      setIsSaving(false);
+    }
   }, [editingTask, invalidate]);
 
   const handleDelete = useCallback(async () => {
     if (!deletingTask) return;
-    await tasksApi.delete(deletingTask.id);
-    setDeletingTask(null);
-    invalidate();
+    try {
+      await tasksApi.delete(deletingTask.id);
+      useToastStore.getState().addToast({ title: 'Task deleted', type: 'success' });
+      setDeletingTask(null);
+      invalidate();
+    } catch {
+      useToastStore.getState().addToast({ title: 'Failed to delete task', description: 'Please try again', type: 'error' });
+    }
   }, [deletingTask, invalidate]);
 
   const handleToggle = useCallback(async (task: Task) => {
-    await tasksApi.update(task.id, { status: task.isCompleted ? 'TODO' : 'DONE' });
-    invalidate();
+    try {
+      await tasksApi.update(task.id, { status: task.isCompleted ? 'TODO' : 'DONE' });
+      useToastStore.getState().addToast({
+        title: task.isCompleted ? 'Task reopened' : 'Task completed',
+        type: 'success',
+      });
+      invalidate();
+    } catch {
+      useToastStore.getState().addToast({ title: 'Failed to update task', description: 'Please try again', type: 'error' });
+    }
   }, [invalidate]);
 
   if (isLoading) {

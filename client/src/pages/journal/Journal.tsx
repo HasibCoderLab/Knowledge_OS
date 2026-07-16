@@ -10,6 +10,7 @@ import Modal from '../../components/ui/Modal';
 import EmptyState from '../../components/ui/EmptyState';
 import Button from '../../components/ui/Button';
 import Skeleton from '../../components/ui/Skeleton';
+import { useToastStore } from '../../store/toastStore';
 import type { JournalEntry } from '../../types';
 import type { JournalFormData } from '../../features/journal/components/JournalForm';
 
@@ -235,8 +236,11 @@ export const Journal: React.FC = () => {
                 date: data.date,
                 tags: data.tags,
               });
+              useToastStore.getState().addToast({ title: 'Journal entry created', type: 'success' });
               setIsNewEntryOpen(false);
               queryClient.invalidateQueries({ queryKey: ['journal'] });
+            } catch {
+              useToastStore.getState().addToast({ title: 'Failed to create entry', description: 'Please try again', type: 'error' });
             } finally {
               setIsSaving(false);
             }

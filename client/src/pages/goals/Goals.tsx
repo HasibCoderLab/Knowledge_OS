@@ -6,6 +6,7 @@ import { goalsApi } from '../../services/api/index';
 import GoalCard from '../../features/goals/components/GoalCard';
 import GoalFilters from '../../features/goals/components/GoalFilters';
 import GoalForm from '../../features/goals/components/GoalForm';
+import { useToastStore } from '../../store/toastStore';
 import type { GoalFormData } from '../../features/goals/components/GoalForm';
 import EmptyState from '../../components/ui/EmptyState';
 import Button from '../../components/ui/Button';
@@ -86,44 +87,61 @@ export const Goals: React.FC = () => {
 
   const handleCreate = useCallback(async (formData: GoalFormData) => {
     setIsSaving(true);
-    await goalsApi.create({
-      title: formData.title,
-      description: formData.description,
-      category: formData.type,
-      targetDate: formData.deadline,
-      status: STATUS_MAP[formData.status] || 'IN_PROGRESS',
-      priority: formData.priority,
-      currentValue: formData.progress,
-      targetValue: 100,
-    });
-    setIsSaving(false);
-    setIsCreating(false);
-    invalidate();
+    try {
+      await goalsApi.create({
+        title: formData.title,
+        description: formData.description,
+        category: formData.type,
+        targetDate: formData.deadline,
+        status: STATUS_MAP[formData.status] || 'IN_PROGRESS',
+        priority: formData.priority,
+        currentValue: formData.progress,
+        targetValue: 100,
+      });
+      useToastStore.getState().addToast({ title: 'Goal created', type: 'success' });
+      setIsCreating(false);
+      invalidate();
+    } catch {
+      useToastStore.getState().addToast({ title: 'Failed to create goal', description: 'Please try again', type: 'error' });
+    } finally {
+      setIsSaving(false);
+    }
   }, [invalidate]);
 
   const handleUpdate = useCallback(async (formData: GoalFormData) => {
     if (!editingGoal) return;
     setIsSaving(true);
-    await goalsApi.update(editingGoal.id, {
-      title: formData.title,
-      description: formData.description,
-      category: formData.type,
-      targetDate: formData.deadline,
-      status: STATUS_MAP[formData.status] || 'IN_PROGRESS',
-      priority: formData.priority,
-      currentValue: formData.progress,
-      targetValue: 100,
-    });
-    setIsSaving(false);
-    setEditingGoal(null);
-    invalidate();
+    try {
+      await goalsApi.update(editingGoal.id, {
+        title: formData.title,
+        description: formData.description,
+        category: formData.type,
+        targetDate: formData.deadline,
+        status: STATUS_MAP[formData.status] || 'IN_PROGRESS',
+        priority: formData.priority,
+        currentValue: formData.progress,
+        targetValue: 100,
+      });
+      useToastStore.getState().addToast({ title: 'Goal updated', type: 'success' });
+      setEditingGoal(null);
+      invalidate();
+    } catch {
+      useToastStore.getState().addToast({ title: 'Failed to update goal', description: 'Please try again', type: 'error' });
+    } finally {
+      setIsSaving(false);
+    }
   }, [editingGoal, invalidate]);
 
   const handleDelete = useCallback(async () => {
     if (!deletingGoal) return;
-    await goalsApi.delete(deletingGoal.id);
-    setDeletingGoal(null);
-    invalidate();
+    try {
+      await goalsApi.delete(deletingGoal.id);
+      useToastStore.getState().addToast({ title: 'Goal deleted', type: 'success' });
+      setDeletingGoal(null);
+      invalidate();
+    } catch {
+      useToastStore.getState().addToast({ title: 'Failed to delete goal', description: 'Please try again', type: 'error' });
+    }
   }, [deletingGoal, invalidate]);
 
   if (isLoading) {

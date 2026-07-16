@@ -1,11 +1,12 @@
 import React, { Suspense, lazy, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import MainLayout from './layouts/MainLayout';
 import ToastContainer from './components/ui/Toast';
 import ScrollToTop from './components/layout/ScrollToTop';
 import { LanguageProvider } from './i18n';
 import { useAuthStore } from './store/authStore';
+import type { ReactNode } from 'react';
 
 const LandingPage = lazy(() => import('./pages/landing/LandingPage'));
 const Dashboard = lazy(() => import('./pages/dashboard/Dashboard').then(m => ({ default: m.Dashboard })));
@@ -45,7 +46,11 @@ const PageLoader: React.FC = () => (
   </div>
 );
 
-const AuthInitializer: React.FC = ({ children }: { children: React.ReactNode }) => {
+interface PropsWithChildren {
+  children: ReactNode;
+}
+
+const AuthInitializer: React.FC<PropsWithChildren> = ({ children }) => {
   const { isInitializing, initAuth } = useAuthStore();
 
   useEffect(() => {
@@ -63,7 +68,7 @@ const AuthInitializer: React.FC = ({ children }: { children: React.ReactNode }) 
   return <>{children}</>;
 };
 
-const ProtectedRoute: React.FC = ({ children }: { children: React.ReactNode }) => {
+const ProtectedRoute = ({ children }: PropsWithChildren) => {
   const { isAuthenticated, isInitializing } = useAuthStore();
 
   if (isInitializing) {
@@ -81,7 +86,7 @@ const ProtectedRoute: React.FC = ({ children }: { children: React.ReactNode }) =
   return <>{children}</>;
 };
 
-const PublicRoute: React.FC = ({ children }: { children: React.ReactNode }) => {
+const PublicRoute = () => {
   const { isAuthenticated, isInitializing } = useAuthStore();
 
   if (isInitializing) {
@@ -96,7 +101,7 @@ const PublicRoute: React.FC = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/dashboard" replace />;
   }
 
-  return <>{children}</>;
+  return <Outlet />;
 };
 
 function App() {

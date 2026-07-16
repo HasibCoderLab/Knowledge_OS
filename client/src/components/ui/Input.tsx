@@ -3,9 +3,10 @@ import React from 'react';
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string | undefined;
+  helpText?: string;
 }
 
-const Input: React.FC<InputProps> = ({ label, error, className = '', ...props }) => {
+const Input: React.FC<InputProps> = ({ label, error, helpText, className = '', ...props }) => {
   return (
     <div className="flex flex-col gap-1.5 w-full">
       {label && (
@@ -26,6 +27,7 @@ const Input: React.FC<InputProps> = ({ label, error, className = '', ...props })
         {...props}
       />
       {error && <span className="text-xs text-red-500 font-medium">{error}</span>}
+      {helpText && !error && <span className="text-xs text-slate-400 dark:text-slate-500">{helpText}</span>}
     </div>
   );
 };

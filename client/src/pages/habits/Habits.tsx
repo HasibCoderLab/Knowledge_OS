@@ -6,6 +6,7 @@ import { habitsApi } from '../../services/api/index';
 import HabitCard from '../../features/habits/components/HabitCard';
 import HabitFilters from '../../features/habits/components/HabitFilters';
 import HabitForm from '../../features/habits/components/HabitForm';
+import { useToastStore } from '../../store/toastStore';
 import type { HabitFormData } from '../../features/habits/components/HabitForm';
 import EmptyState from '../../components/ui/EmptyState';
 import Button from '../../components/ui/Button';
@@ -88,34 +89,56 @@ export const Habits: React.FC = () => {
 
   const handleCreate = useCallback(async (formData: HabitFormData) => {
     setIsSaving(true);
-    await habitsApi.create(formData as unknown as Record<string, unknown>);
-    setIsSaving(false);
-    setIsCreating(false);
-    invalidate();
+    try {
+      await habitsApi.create(formData as unknown as Record<string, unknown>);
+      useToastStore.getState().addToast({ title: 'Habit created', type: 'success' });
+      setIsCreating(false);
+      invalidate();
+    } catch {
+      useToastStore.getState().addToast({ title: 'Failed to create habit', description: 'Please try again', type: 'error' });
+    } finally {
+      setIsSaving(false);
+    }
   }, [invalidate]);
 
   const handleUpdate = useCallback(async (formData: HabitFormData) => {
     if (!editingHabit) return;
     setIsSaving(true);
-    await habitsApi.update(editingHabit.id, formData as unknown as Record<string, unknown>);
-    setIsSaving(false);
-    setEditingHabit(null);
-    invalidate();
+    try {
+      await habitsApi.update(editingHabit.id, formData as unknown as Record<string, unknown>);
+      useToastStore.getState().addToast({ title: 'Habit updated', type: 'success' });
+      setEditingHabit(null);
+      invalidate();
+    } catch {
+      useToastStore.getState().addToast({ title: 'Failed to update habit', description: 'Please try again', type: 'error' });
+    } finally {
+      setIsSaving(false);
+    }
   }, [editingHabit, invalidate]);
 
   const handleDelete = useCallback(async () => {
     if (!deletingHabit) return;
-    await habitsApi.delete(deletingHabit.id);
-    setDeletingHabit(null);
-    invalidate();
+    try {
+      await habitsApi.delete(deletingHabit.id);
+      useToastStore.getState().addToast({ title: 'Habit deleted', type: 'success' });
+      setDeletingHabit(null);
+      invalidate();
+    } catch {
+      useToastStore.getState().addToast({ title: 'Failed to delete habit', description: 'Please try again', type: 'error' });
+    }
   }, [deletingHabit, invalidate]);
 
   const handleToggle = useCallback(async (habit: Habit) => {
-    await habitsApi.log(habit.id, {
-      date: new Date().toISOString(),
-      completed: true,
-    });
-    invalidate();
+    try {
+      await habitsApi.log(habit.id, {
+        date: new Date().toISOString(),
+        completed: true,
+      });
+      useToastStore.getState().addToast({ title: 'Habit logged', description: `${habit.name} completed`, type: 'success' });
+      invalidate();
+    } catch {
+      useToastStore.getState().addToast({ title: 'Failed to log habit', description: 'Please try again', type: 'error' });
+    }
   }, [invalidate]);
 
   const isLoading = habitsLoading;

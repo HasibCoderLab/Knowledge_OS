@@ -8,6 +8,7 @@ import Input from '../../components/ui/Input';
 import { authApi } from '../../services/api/index';
 import { useLanguage } from '../../i18n/useLanguage';
 import { useAuthStore } from '../../store/authStore';
+import { useToastStore } from '../../store/toastStore';
 import type { AuthUser } from '../../store/authStore';
 import type { SupportedLocale } from '../../i18n/locales';
 
@@ -42,6 +43,9 @@ export const ProfileSection: React.FC = () => {
     try {
       const updatedUser = await authApi.updateProfile({ name, username, bio });
       setAuth(updatedUser as AuthUser, null);
+      useToastStore.getState().addToast({ title: 'Profile updated', type: 'success' });
+    } catch {
+      useToastStore.getState().addToast({ title: 'Failed to update profile', description: 'Please try again', type: 'error' });
     } finally {
       setIsSaving(false);
     }

@@ -8,6 +8,19 @@ function extract<T>(response: { data: { success: boolean; data: T; pagination?: 
   return { ...response.data.data, ...(response.data.pagination ? { pagination: response.data.pagination } : {}) };
 }
 
+export interface UserProfile {
+  id: string;
+  name: string;
+  username: string | null;
+  email: string;
+  avatar: string | null;
+  bio: string | null;
+  location: string | null;
+  theme: string;
+  language: string;
+  createdAt: string;
+}
+
 export const authApi = {
   register: (data: { name: string; email: string; password: string; username?: string }) =>
     api.post('/auth/register', data).then(unwrap),
@@ -108,9 +121,9 @@ export const habitsApi = {
 };
 
 export const settingsApi = {
-  get: () => api.get('/settings').then(unwrap),
+  get: () => api.get('/settings').then(unwrap) as Promise<{ data: UserProfile }>,
   update: (data: Record<string, unknown>) =>
-    api.patch('/settings', data).then(unwrap),
+    api.patch('/settings', data).then(unwrap) as Promise<{ data: UserProfile }>,
 };
 
 export const analyticsApi = {

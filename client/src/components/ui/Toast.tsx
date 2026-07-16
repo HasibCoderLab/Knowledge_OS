@@ -18,17 +18,17 @@ const colorMap = {
 };
 
 const toastVariants = {
-  initial: { opacity: 0, y: 20, scale: 0.95 },
+  initial: { opacity: 0, x: 80, scale: 0.92 },
   animate: {
     opacity: 1,
-    y: 0,
+    x: 0,
     scale: 1,
-    transition: { duration: 0.3, ease: [0.16, 1, 0.3, 1] as const },
+    transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] as const },
   },
   exit: {
     opacity: 0,
-    y: -10,
-    scale: 0.95,
+    x: 100,
+    scale: 0.92,
     transition: { duration: 0.2, ease: 'easeIn' as const },
   },
 };
@@ -39,7 +39,7 @@ const ToastContainer: React.FC = () => {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-[60] flex flex-col gap-2 max-w-sm w-full">
+    <div className="fixed bottom-4 right-4 z-[60] flex flex-col-reverse gap-2 max-w-sm w-full pointer-events-none">
       <AnimatePresence>
         {toasts.map((toast) => {
           const Icon = iconMap[toast.type as keyof typeof iconMap];
@@ -51,8 +51,9 @@ const ToastContainer: React.FC = () => {
               initial="initial"
               animate="animate"
               exit="exit"
-              className={`flex items-start gap-3 px-4 py-3.5 rounded-xl border shadow-lg ${colorClass}`}
+              className={`flex items-start gap-3 px-4 py-3.5 rounded-xl border shadow-lg pointer-events-auto ${colorClass}`}
               role="alert"
+              layout
             >
               <Icon size={18} className="shrink-0 mt-0.5" strokeWidth={2} />
               <div className="flex-1 min-w-0">
