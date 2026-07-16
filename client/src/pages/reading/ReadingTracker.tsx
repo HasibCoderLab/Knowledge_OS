@@ -13,8 +13,10 @@ import Card from '../../components/ui/Card';
 import Skeleton from '../../components/ui/Skeleton';
 import Modal from '../../components/ui/Modal';
 import BookForm from '../../features/library/components/BookForm';
+import ReadingSessionForm from '../../features/reading/components/ReadingSessionForm';
 import type { Book, ReadingSession } from '../../types';
 import type { BookFormData } from '../../features/library/components/BookForm';
+import type { ReadingSessionFormData } from '../../features/reading/components/ReadingSessionForm';
 
 const filterOptions = [
   { value: 'all', label: 'All Books' },
@@ -34,7 +36,9 @@ export const ReadingTracker: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('all');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isSessionModalOpen, setIsSessionModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isSessionSaving, setIsSessionSaving] = useState(false);
 
   const invalidate = useCallback((keys: string[][]) => {
     keys.forEach((key) => queryClient.invalidateQueries({ queryKey: key }));
@@ -147,7 +151,7 @@ export const ReadingTracker: React.FC = () => {
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">Reading Tracker</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5">{stats.totalPagesRead.toLocaleString()} total pages read</p>
         </div>
-        <Button size="sm" className="gap-2 shrink-0"><Plus size={16} /> Log Session</Button>
+        <Button size="sm" className="gap-2 shrink-0" onClick={() => setIsSessionModalOpen(true)}><Plus size={16} /> Log Session</Button>
       </motion.header>
 
       <ReadingStats totalBooks={books.length} completedBooks={stats.completed} readingStreak={stats.streak} pagesToday={stats.pagesToday} />
@@ -218,6 +222,31 @@ export const ReadingTracker: React.FC = () => {
           }}
           onCancel={() => setIsAddModalOpen(false)}
           isSaving={isSaving}
+        />
+      </Modal>
+
+      <Modal isOpen={isSessionModalOpen} onClose={() => setIsSessionModalOpen(false)} title="Log Reading Session" size="md">
+        <ReadingSessionForm
+          books={books}
+          onSave={async (data: ReadingSessionFormData) => {
+            setIsSessionSaving(true);
+            try {
+              await readingApi.create({
+                bookId: data.bookId,
+                date: data.date,
+                pagesRead: data.pagesRead,
+                durationMinutes: data.durationMinutes,
+                startPage: data.startPage,
+                endPage: data.endPage,
+              });
+              setIsSessionModalOpen(false);
+              invalidate([['readingSessions'], ['books']]);
+            } finally {
+              setIsSessionSaving(false);
+            }
+          }}
+          onCancel={() => setIsSessionModalOpen(false)}
+          isSaving={isSessionSaving}
         />
       </Modal>
     </motion.div>

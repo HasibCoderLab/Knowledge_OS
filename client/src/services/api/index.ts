@@ -21,6 +21,12 @@ export const authApi = {
     api.patch('/users/me', data).then(unwrap),
 };
 
+export const usersApi = {
+  getProfile: () => api.get('/users/me').then(unwrap),
+  updateProfile: (data: Record<string, unknown>) =>
+    api.patch('/users/me', data).then(unwrap),
+};
+
 export const libraryApi = {
   getAll: (params?: Record<string, unknown>) =>
     api.get('/library', { params }).then((r) => r.data),

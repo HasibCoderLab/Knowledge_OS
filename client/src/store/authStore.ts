@@ -10,6 +10,8 @@ export interface AuthUser {
   username?: string;
   bio?: string;
   createdAt?: string;
+  theme?: string;
+  language?: string;
 }
 
 interface AuthState {
@@ -17,12 +19,15 @@ interface AuthState {
   accessToken: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  isInitializing: boolean;
   error: string | null;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string, username?: string) => Promise<void>;
   logout: (queryClient?: { clear: () => void }) => Promise<void>;
   clearError: () => void;
   setAuth: (user: AuthUser | null, token: string | null) => void;
+  initAuth: () => Promise<void>;
+  updateUser: (user: Partial<AuthUser>) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -32,6 +37,7 @@ export const useAuthStore = create<AuthState>()(
       accessToken: null,
       isAuthenticated: false,
       isLoading: false,
+      isInitializing: true,
       error: null,
 
       login: async (email: string, password: string) => {
@@ -41,7 +47,7 @@ export const useAuthStore = create<AuthState>()(
           const { user, accessToken, refreshToken } = result as { user: AuthUser; accessToken: string; refreshToken: string };
           localStorage.setItem('accessToken', accessToken);
           if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
-          set({ user, accessToken, isAuthenticated: true, isLoading: false });
+          set({ user, accessToken, isAuthenticated: true, isLoading: false, isInitializing: false });
         } catch (err: unknown) {
           const message =
             err && typeof err === 'object' && 'response' in err
@@ -49,7 +55,7 @@ export const useAuthStore = create<AuthState>()(
               : err instanceof Error
                 ? err.message
                 : 'Login failed. Please try again.';
-          set({ error: message, isLoading: false });
+          set({ error: message, isLoading: false, isInitializing: false });
           throw err;
         }
       },
@@ -63,7 +69,7 @@ export const useAuthStore = create<AuthState>()(
           const { user, accessToken, refreshToken } = result as { user: AuthUser; accessToken: string; refreshToken: string };
           localStorage.setItem('accessToken', accessToken);
           if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
-          set({ user, accessToken, isAuthenticated: true, isLoading: false });
+          set({ user, accessToken, isAuthenticated: true, isLoading: false, isInitializing: false });
         } catch (err: unknown) {
           const message =
             err && typeof err === 'object' && 'response' in err
@@ -71,7 +77,7 @@ export const useAuthStore = create<AuthState>()(
               : err instanceof Error
                 ? err.message
                 : 'Registration failed. Please try again.';
-          set({ error: message, isLoading: false });
+          set({ error: message, isLoading: false, isInitializing: false });
           throw err;
         }
       },
@@ -86,11 +92,10 @@ export const useAuthStore = create<AuthState>()(
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
           localStorage.removeItem('auth-storage');
-          // Clear React Query cache
           if (queryClient) {
             queryClient.clear();
           }
-          set({ user: null, accessToken: null, isAuthenticated: false, isLoading: false, error: null });
+          set({ user: null, accessToken: null, isAuthenticated: false, isLoading: false, error: null, isInitializing: false });
         }
       },
 
@@ -98,7 +103,32 @@ export const useAuthStore = create<AuthState>()(
 
       setAuth: (user, token) => {
         if (token) localStorage.setItem('accessToken', token);
-        set({ user, accessToken: token, isAuthenticated: !!user, error: null });
+        set({ user, accessToken: token, isAuthenticated: !!user, error: null, isInitializing: false });
+      },
+
+      initAuth: async () => {
+        set({ isInitializing: true });
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+          set({ isInitializing: false, isAuthenticated: false, user: null, accessToken: null });
+          return;
+        }
+        try {
+          const user = await authApi.getMe() as AuthUser;
+          localStorage.setItem('accessToken', token);
+          set({ user, accessToken: token, isAuthenticated: true, isInitializing: false });
+        } catch {
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          localStorage.removeItem('auth-storage');
+          set({ user: null, accessToken: null, isAuthenticated: false, isInitializing: false });
+        }
+      },
+
+      updateUser: (userData) => {
+        set((state) => ({
+          user: state.user ? { ...state.user, ...userData } : null,
+        }));
       },
     }),
     {

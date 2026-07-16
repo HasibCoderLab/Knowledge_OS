@@ -1,19 +1,21 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import {
   User, Mail, Calendar, BookOpen, BookMarked, FileText,
   Target, CheckSquare, ListChecks, Flame, Activity,
-  Settings, LogOut, Camera, Pencil,
+  Settings, LogOut, Camera, Pencil, X, Save, Loader2,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
-import { libraryApi, readingApi, journalApi, goalsApi, tasksApi, habitsApi } from '../../services/api/index';
+import { libraryApi, readingApi, journalApi, goalsApi, tasksApi, habitsApi, settingsApi } from '../../services/api/index';
 import Card from '../../components/ui/Card';
 import Avatar from '../../components/ui/Avatar';
 import Button from '../../components/ui/Button';
 import Badge from '../../components/ui/Badge';
 import Skeleton from '../../components/ui/Skeleton';
+import Input from '../../components/ui/Input';
+import Modal from '../../components/ui/Modal';
 
 const colorClasses = {
   indigo: { bg: 'bg-indigo-50', darkBg: 'dark:bg-indigo-500/10', text: 'text-indigo-600', darkText: 'dark:text-indigo-400' },
@@ -27,13 +29,15 @@ const colorClasses = {
 
 type ColorKey = keyof typeof colorClasses;
 
-const StatCard: React.FC<{
+interface StatCardProps {
   icon: React.ReactNode;
   label: string;
   value: number | string;
   color: ColorKey;
   index: number;
-}> = ({ icon, label, value, color, index }) => {
+}
+
+const StatCard: React.FC<StatCardProps> = ({ icon, label, value, color, index }) => {
   const colors = colorClasses[color];
   return (
     <motion.div
@@ -57,10 +61,7 @@ const StatCard: React.FC<{
 
 const containerVariants = {
   hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.06 },
-  },
+  visible: { opacity: 1, transition: { staggerChildren: 0.06 } },
 };
 
 const itemVariants = {
@@ -68,10 +69,23 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] as const } },
 };
 
+interface UserProfile {
+  id: string;
+  name: string;
+  username: string | null;
+  email: string;
+  avatar: string | null;
+  bio: string | null;
+  location: string | null;
+  theme: string;
+  language: string;
+  createdAt: string;
+}
+
 export const Profile: React.FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { user, logout } = useAuthStore();
+  const { user: authUser, logout, updateUser } = useAuthStore();
 
   const { data: booksData, isLoading: booksLoading } = useQuery({
     queryKey: ['books'],
@@ -103,7 +117,15 @@ export const Profile: React.FC = () => {
     queryFn: () => habitsApi.getAll({ limit: 1000 }),
   });
 
-  const isLoading = booksLoading || sessionsLoading || journalLoading || goalsLoading || tasksLoading || habitsLoading;
+  const { data: profileData, isLoading: profileLoading, refetch: refetchProfile } = useQuery({
+    queryKey: ['profile'],
+    queryFn: () => settingsApi.get(),
+    enabled: !!authUser,
+  });
+
+  const user = profileData?.data as UserProfile | undefined ?? authUser;
+
+  const isLoading = booksLoading || sessionsLoading || journalLoading || goalsLoading || tasksLoading || habitsLoading || profileLoading;
 
   const stats = useMemo(() => {
     const books = (booksData?.data as Array<Record<string, unknown>>) ?? [];
@@ -128,9 +150,36 @@ export const Profile: React.FC = () => {
     };
   }, [booksData, sessionsData, journalData, goalsData, tasksData, habitsData]);
 
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editName, setEditName] = useState(user?.name ?? '');
+  const [editUsername, setEditUsername] = useState(user?.username ?? '');
+  const [editBio, setEditBio] = useState(user?.bio ?? '');
+  const [editLocation, setEditLocation] = useState(user?.location ?? '');
+
+  const updateProfileMutation = useMutation({
+    mutationFn: (data: { name: string; username: string; bio: string; location: string }) =>
+      settingsApi.update(data),
+    onSuccess: (response) => {
+      const updatedUser = response.data as UserProfile;
+      updateUser(updatedUser);
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      setEditModalOpen(false);
+    },
+  });
+
   const handleLogout = async () => {
     await logout(queryClient);
     navigate('/auth/login', { replace: true });
+  };
+
+  const handleEditSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateProfileMutation.mutate({
+      name: editName,
+      username: editUsername.toLowerCase(),
+      bio: editBio,
+      location: editLocation,
+    });
   };
 
   const createdDate = user?.createdAt
@@ -170,7 +219,7 @@ export const Profile: React.FC = () => {
       >
         <div className="flex items-center gap-4">
           <div className="relative group shrink-0">
-            <Avatar src={user?.avatar} name={user?.name} size="xl" />
+            <Avatar src={user?.avatar ?? undefined} name={user?.name} size="xl" />
             <button
               className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
               aria-label="Change avatar"
@@ -180,7 +229,7 @@ export const Profile: React.FC = () => {
           </div>
           <div>
             <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
-              {user?.name ?? 'User'}
+              {user?.name}
             </h2>
             {user?.username && (
               <p className="text-sm text-slate-500 dark:text-slate-400">@{user.username}</p>
@@ -192,7 +241,13 @@ export const Profile: React.FC = () => {
             variant="outline"
             size="sm"
             className="gap-2"
-            onClick={() => navigate('/settings')}
+            onClick={() => {
+              setEditName(user?.name ?? '');
+              setEditUsername(user?.username ?? '');
+              setEditBio(user?.bio ?? '');
+              setEditLocation(user?.location ?? '');
+              setEditModalOpen(true);
+            }}
           >
             <Pencil size={14} />
             Edit Profile
@@ -245,6 +300,21 @@ export const Profile: React.FC = () => {
               </div>
             </div>
           </div>
+          {user?.bio && (
+            <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">Bio</p>
+              <p className="text-sm text-slate-700 dark:text-slate-300">{user.bio}</p>
+            </div>
+          )}
+          {user?.location && (
+            <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">Location</p>
+              <p className="text-sm text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                <MapPin size={12} className="text-slate-400" />
+                {user.location}
+              </p>
+            </div>
+          )}
         </Card>
       </motion.div>
 
@@ -303,6 +373,74 @@ export const Profile: React.FC = () => {
           </div>
         </Card>
       </motion.div>
+
+      {/* Edit Profile Modal */}
+      <Modal
+        isOpen={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        title="Edit Profile"
+        size="md"
+      >
+        <form onSubmit={handleEditSubmit} className="space-y-4">
+          <Input
+            label="Full Name"
+            value={editName}
+            onChange={(e) => setEditName(e.target.value)}
+            placeholder="Enter your full name"
+          />
+          <Input
+            label="Username"
+            value={editUsername}
+            onChange={(e) => setEditUsername(e.target.value)}
+            placeholder="Enter username"
+            helpText="Letters, numbers, and underscores only"
+          />
+          <div>
+            <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 block">Bio</label>
+            <textarea
+              className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none transition-all duration-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder:text-slate-400 dark:placeholder:text-slate-500"
+              rows={3}
+              placeholder="Tell us about yourself..."
+              value={editBio}
+              onChange={(e) => setEditBio(e.target.value)}
+            />
+          </div>
+          <Input
+            label="Location"
+            value={editLocation}
+            onChange={(e) => setEditLocation(e.target.value)}
+            placeholder="Enter your location"
+          />
+          <div className="flex justify-end gap-3 pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setEditModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              isLoading={updateProfileMutation.isPending}
+            >
+              <Save size={14} className="mr-1" />
+              Save Changes
+            </Button>
+          </div>
+        </form>
+      </Modal>
     </motion.div>
   );
 };
+
+function MapPin({ size = 16, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+      <circle cx="12" cy="10" r="3" />
+    </svg>
+  );
+}
+
+export default Profile;

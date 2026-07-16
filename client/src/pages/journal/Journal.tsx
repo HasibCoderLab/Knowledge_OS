@@ -1,14 +1,17 @@
 import React, { useState, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { BookMarked, Plus, PenLine, Flame, CalendarDays, Quote, BookHeart } from 'lucide-react';
 import { journalApi } from '../../services/api/index';
 import JournalCard from '../../features/journal/components/JournalCard';
 import JournalFilters from '../../features/journal/components/JournalFilters';
+import JournalForm from '../../features/journal/components/JournalForm';
+import Modal from '../../components/ui/Modal';
 import EmptyState from '../../components/ui/EmptyState';
 import Button from '../../components/ui/Button';
 import Skeleton from '../../components/ui/Skeleton';
 import type { JournalEntry } from '../../types';
+import type { JournalFormData } from '../../features/journal/components/JournalForm';
 
 const filterOptions = [
   { value: 'all', label: 'All' },
@@ -37,8 +40,11 @@ const quoteIndex = today.getDate() % dailyQuotes.length;
 const dailyQuote = dailyQuotes[quoteIndex]!;
 
 export const Journal: React.FC = () => {
+  const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('all');
+  const [isNewEntryOpen, setIsNewEntryOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ['journal'],
@@ -143,7 +149,7 @@ export const Journal: React.FC = () => {
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">Journal</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5">{entries.length} entries · {stats.thisMonth} this month</p>
         </div>
-        <Button size="sm" className="gap-2 shrink-0"><Plus size={16} /> New Entry</Button>
+        <Button size="sm" className="gap-2 shrink-0" onClick={() => setIsNewEntryOpen(true)}><Plus size={16} /> New Entry</Button>
       </motion.header>
 
       <motion.div
@@ -206,7 +212,7 @@ export const Journal: React.FC = () => {
           {searchQuery || activeFilter !== 'all' ? (
             <EmptyState icon={BookMarked} title="No entries found" description="Try a different search or filter" />
           ) : (
-            <EmptyState icon={BookMarked} title="No entries yet" description="Write your first journal entry to start reflecting" actionLabel="New Entry" onAction={() => {}} />
+            <EmptyState icon={BookMarked} title="No entries yet" description="Write your first journal entry to start reflecting" actionLabel="New Entry" onAction={() => setIsNewEntryOpen(true)} />
           )}
         </motion.div>
       ) : (
@@ -216,6 +222,29 @@ export const Journal: React.FC = () => {
           ))}
         </motion.div>
       )}
+
+      <Modal isOpen={isNewEntryOpen} onClose={() => setIsNewEntryOpen(false)} title="New Journal Entry" size="md">
+        <JournalForm
+          onSave={async (data: JournalFormData) => {
+            setIsSaving(true);
+            try {
+              await journalApi.create({
+                title: data.title,
+                content: data.content,
+                mood: data.mood,
+                date: data.date,
+                tags: data.tags,
+              });
+              setIsNewEntryOpen(false);
+              queryClient.invalidateQueries({ queryKey: ['journal'] });
+            } finally {
+              setIsSaving(false);
+            }
+          }}
+          onCancel={() => setIsNewEntryOpen(false)}
+          isSaving={isSaving}
+        />
+      </Modal>
     </motion.div>
   );
 };

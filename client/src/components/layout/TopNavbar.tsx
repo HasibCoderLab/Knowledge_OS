@@ -219,7 +219,7 @@ const UserMenu: React.FC = () => {
       >
         <Avatar src={user?.avatar} name={user?.name} size="sm" />
         <span className="text-xs font-medium text-slate-700 dark:text-slate-300 hidden sm:block">
-          {user?.name?.split(' ')[0] ?? 'User'}
+          {user?.name?.split(' ')[0] ?? ''}
         </span>
       </button>
       <AnimatePresence>

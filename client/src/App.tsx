@@ -1,10 +1,11 @@
-import React, { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import React, { Suspense, lazy, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import MainLayout from './layouts/MainLayout';
 import ToastContainer from './components/ui/Toast';
 import ScrollToTop from './components/layout/ScrollToTop';
 import { LanguageProvider } from './i18n';
+import { useAuthStore } from './store/authStore';
 
 const LandingPage = lazy(() => import('./pages/landing/LandingPage'));
 const Dashboard = lazy(() => import('./pages/dashboard/Dashboard').then(m => ({ default: m.Dashboard })));
@@ -44,40 +45,98 @@ const PageLoader: React.FC = () => (
   </div>
 );
 
+const AuthInitializer: React.FC = ({ children }: { children: React.ReactNode }) => {
+  const { isInitializing, initAuth } = useAuthStore();
+
+  useEffect(() => {
+    initAuth();
+  }, [initAuth]);
+
+  if (isInitializing) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="w-7 h-7 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  return <>{children}</>;
+};
+
+const ProtectedRoute: React.FC = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, isInitializing } = useAuthStore();
+
+  if (isInitializing) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="w-7 h-7 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/auth/login" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+const PublicRoute: React.FC = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, isInitializing } = useAuthStore();
+
+  if (isInitializing) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="w-7 h-7 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <>{children}</>;
+};
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
       <BrowserRouter>
         <ScrollToTop />
-        <Suspense fallback={<PageLoader />}>
-          <Routes>
-            <Route element={<MainLayout />}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/library" element={<Library />} />
-              <Route path="/notes" element={<Notes />} />
-              <Route path="/goals" element={<Goals />} />
-              <Route path="/habits" element={<Habits />} />
-              <Route path="/tasks" element={<Tasks />} />
-              <Route path="/journal" element={<Journal />} />
-              <Route path="/reading" element={<ReadingTracker />} />
-              <Route path="/analytics" element={<Analytics />} />
-              <Route path="/calendar" element={<CalendarPage />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/settings" element={<SettingsPage />} />
-              <Route path="/search" element={<Search />} />
-              <Route path="/notifications" element={<Notifications />} />
-              <Route path="/docs" element={<DocsPage />} />
-              <Route path="/site-map" element={<SiteMapPage />} />
-            </Route>
-            <Route path="/auth/login" element={<Login />} />
-            <Route path="/auth/register" element={<Register />} />
-            <Route path="/" element={<LandingPage />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
+        <AuthInitializer>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/library" element={<Library />} />
+                <Route path="/notes" element={<Notes />} />
+                <Route path="/goals" element={<Goals />} />
+                <Route path="/habits" element={<Habits />} />
+                <Route path="/tasks" element={<Tasks />} />
+                <Route path="/journal" element={<Journal />} />
+                <Route path="/reading" element={<ReadingTracker />} />
+                <Route path="/analytics" element={<Analytics />} />
+                <Route path="/calendar" element={<CalendarPage />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/settings" element={<SettingsPage />} />
+                <Route path="/search" element={<Search />} />
+                <Route path="/notifications" element={<Notifications />} />
+                <Route path="/docs" element={<DocsPage />} />
+                <Route path="/site-map" element={<SiteMapPage />} />
+              </Route>
+              <Route element={<PublicRoute />}>
+                <Route path="/auth/login" element={<Login />} />
+                <Route path="/auth/register" element={<Register />} />
+              </Route>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </AuthInitializer>
+        <ToastContainer />
       </BrowserRouter>
-      <ToastContainer />
       </LanguageProvider>
     </QueryClientProvider>
   );

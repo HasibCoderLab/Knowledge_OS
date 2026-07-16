@@ -6,6 +6,10 @@ export const usersRepository = {
     return prisma.user.findUnique({ where: { id } });
   },
 
+  async findByUsername(username: string) {
+    return prisma.user.findUnique({ where: { username } });
+  },
+
   async update(id: string, data: UpdateProfileInput) {
     const updateData: Record<string, unknown> = {};
     if (data.name !== undefined) updateData.name = data.name;

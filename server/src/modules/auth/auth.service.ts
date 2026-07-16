@@ -28,6 +28,13 @@ export const authService = {
       throw new ConflictError('User with this email already exists');
     }
 
+    if (input.username) {
+      const existingUsername = await authRepository.findByUsername(input.username.toLowerCase());
+      if (existingUsername) {
+        throw new ConflictError('Username is already taken');
+      }
+    }
+
     const hashedPassword = await bcrypt.hash(input.password, env.bcryptSaltRounds);
 
     const user = await authRepository.create({

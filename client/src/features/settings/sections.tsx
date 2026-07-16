@@ -5,8 +5,10 @@ import {
 } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
+import { authApi } from '../../services/api/index';
 import { useLanguage } from '../../i18n/useLanguage';
 import { useAuthStore } from '../../store/authStore';
+import type { AuthUser } from '../../store/authStore';
 import type { SupportedLocale } from '../../i18n/locales';
 
 interface SectionHeaderProps {
@@ -29,9 +31,21 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({ icon, title, description 
 
 export const ProfileSection: React.FC = () => {
   const { t } = useLanguage();
-  const { user } = useAuthStore();
+  const { user, setAuth } = useAuthStore();
   const [name, setName] = useState(user?.name ?? '');
   const [username, setUsername] = useState(user?.username ?? '');
+  const [bio, setBio] = useState(user?.bio ?? '');
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const updatedUser = await authApi.updateProfile({ name, username, bio });
+      setAuth(updatedUser as AuthUser, null);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const initials = user?.name
     ? user.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
@@ -51,7 +65,7 @@ export const ProfileSection: React.FC = () => {
             </button>
           </div>
           <div>
-            <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{name || 'User'}</p>
+            <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{name}</p>
             {username && <p className="text-xs text-slate-500 dark:text-slate-400">@{username}</p>}
           </div>
         </div>
@@ -71,11 +85,12 @@ export const ProfileSection: React.FC = () => {
             className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none transition-all duration-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder:text-slate-400 dark:placeholder:text-slate-500"
             rows={3}
             placeholder="Tell us about yourself..."
-            defaultValue={user?.bio ?? ''}
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
           />
         </div>
         <div className="flex justify-end pt-2">
-          <Button variant="primary" size="sm">{t('settings.saveChanges')}</Button>
+          <Button variant="primary" size="sm" onClick={handleSave} isLoading={isSaving}>{t('settings.saveChanges')}</Button>
         </div>
       </div>
     </div>

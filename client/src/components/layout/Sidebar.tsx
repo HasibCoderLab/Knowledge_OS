@@ -263,7 +263,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             <Avatar src={user?.avatar} name={user?.name} size="sm" />
             <div className="flex-1 min-w-0">
               <p className="text-xs font-semibold text-slate-900 dark:text-slate-100 truncate">
-                {user?.name ?? 'User'}
+                {user?.name ?? user?.email?.split('@')[0] ?? ''}
               </p>
               <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">{user?.email}</p>
             </div>
