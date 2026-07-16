@@ -139,9 +139,9 @@ export const CalendarPage: React.FC = () => {
     suggestions: useQuery({ queryKey: ['calendarSuggestions'], queryFn: calendarData.getCalendarSuggestions }),
     heatmap: useQuery({ queryKey: ['heatmap'], queryFn: calendarData.getHeatmapData }),
     moods: useQuery({ queryKey: ['calendarMoods'], queryFn: calendarData.getCalendarMoods }),
-    reading: useQuery({ queryKey: ['readingSessions'], queryFn: () => readingApi.getAll({ limit: 1000 }) }),
-    tasks: useQuery({ queryKey: ['tasks'], queryFn: () => tasksApi.getAll({ limit: 1000 }) }),
-    journal: useQuery({ queryKey: ['journal'], queryFn: () => journalApi.getAll({ limit: 1000 }) }),
+    reading: useQuery({ queryKey: ['readingSessions'], queryFn: () => readingApi.getAll({ limit: 100 }) }),
+    tasks: useQuery({ queryKey: ['tasks'], queryFn: () => tasksApi.getAll({ limit: 100 }) }),
+    journal: useQuery({ queryKey: ['journal'], queryFn: () => journalApi.getAll({ limit: 100 }) }),
   };
 
   const loading = Object.values(q).some(x => x.isLoading);

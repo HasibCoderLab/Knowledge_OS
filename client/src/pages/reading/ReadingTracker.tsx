@@ -47,12 +47,12 @@ export const ReadingTracker: React.FC = () => {
 
   const { data: booksData, isLoading: booksLoading } = useQuery({
     queryKey: ['books'],
-    queryFn: () => libraryApi.getAll({ limit: 1000 }),
+    queryFn: () => libraryApi.getAll({ limit: 100 }),
   });
 
   const { data: sessionsData, isLoading: sessionsLoading } = useQuery({
     queryKey: ['readingSessions'],
-    queryFn: () => readingApi.getAll({ limit: 1000 }),
+    queryFn: () => readingApi.getAll({ limit: 100 }),
   });
 
   const books: Book[] = booksData?.data ?? [];

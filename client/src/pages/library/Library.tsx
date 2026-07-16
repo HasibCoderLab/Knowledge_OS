@@ -13,6 +13,7 @@ import Badge from '../../components/ui/Badge';
 import BookForm from '../../features/library/components/BookForm';
 import type { Book } from '../../types';
 import type { BookFormData } from '../../features/library/components/BookForm';
+import { useToastStore } from '../../store/toastStore';
 
 const filterOptions = [
   { value: 'all', label: 'All' },
@@ -45,7 +46,7 @@ export const Library: React.FC = () => {
 
   const { data, isLoading } = useQuery({
     queryKey: ['books'],
-    queryFn: () => libraryApi.getAll({ limit: 1000 }),
+    queryFn: () => libraryApi.getAll({ limit: 100 }),
   });
 
   const books: Book[] = data?.data ?? [];
@@ -224,12 +225,12 @@ export const Library: React.FC = () => {
                   <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2"><Clock size={14} className="text-indigo-500" /> Reading Progress</h4>
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-slate-500 dark:text-slate-400">Page {book.currentPage} of {book.totalPages}</span>
-                    <span className="font-semibold text-indigo-600 dark:text-indigo-400">{Math.round((book.currentPage / book.totalPages) * 100)}%</span>
+                    <span className="font-semibold text-indigo-600 dark:text-indigo-400">{book.totalPages > 0 ? Math.round((book.currentPage / book.totalPages) * 100) : 0}%</span>
                   </div>
                   <div className="w-full h-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-full overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
-                      animate={{ width: `${(book.currentPage / book.totalPages) * 100}%` }}
+                      animate={{ width: `${book.totalPages > 0 ? (book.currentPage / book.totalPages) * 100 : 0}%` }}
                       transition={{ duration: 1, ease: 'easeOut' as const }}
                       className="h-full bg-indigo-500 rounded-full"
                     />
@@ -248,22 +249,28 @@ export const Library: React.FC = () => {
         <BookForm
           onSave={async (data: BookFormData) => {
             setIsSaving(true);
-            await libraryApi.create({
-              title: data.title,
-              author: data.author,
-              category: data.category,
-              coverUrl: data.coverUrl,
-              status: data.status,
-              totalPages: data.totalPages,
-              currentPage: data.currentPage,
-              startDate: data.startDate,
-              finishDate: data.finishDate,
-              rating: data.rating,
-              tags: data.tags,
-            });
-            setIsSaving(false);
-            setIsAddModalOpen(false);
-            invalidate([['books']]);
+            try {
+              await libraryApi.create({
+                title: data.title,
+                author: data.author,
+                category: data.category,
+                coverUrl: data.coverUrl,
+                status: data.status,
+                totalPages: data.totalPages,
+                currentPage: data.currentPage,
+                startDate: data.startDate,
+                finishDate: data.finishDate,
+                rating: data.rating,
+                tags: data.tags,
+              });
+              useToastStore.getState().addToast({ title: 'Book added', type: 'success' });
+              setIsAddModalOpen(false);
+              invalidate([['books']]);
+            } catch {
+              useToastStore.getState().addToast({ title: 'Failed to add book', description: 'Please try again', type: 'error' });
+            } finally {
+              setIsSaving(false);
+            }
           }}
           onCancel={() => setIsAddModalOpen(false)}
           isSaving={isSaving}

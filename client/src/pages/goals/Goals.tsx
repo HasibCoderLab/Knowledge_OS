@@ -52,7 +52,7 @@ export const Goals: React.FC = () => {
 
   const { data, isLoading } = useQuery({
     queryKey: ['goals'],
-    queryFn: () => goalsApi.getAll({ limit: 1000 }),
+    queryFn: () => goalsApi.getAll({ limit: 100 }),
   });
 
   const goals: Goal[] = (data?.data ?? []).map((g: Record<string, unknown>) => ({

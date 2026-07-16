@@ -39,7 +39,7 @@ export const Habits: React.FC = () => {
 
   const { data, isLoading: habitsLoading } = useQuery({
     queryKey: ['habits'],
-    queryFn: () => habitsApi.getAll({ limit: 1000 }),
+    queryFn: () => habitsApi.getAll({ limit: 100 }),
   });
 
   const rawHabits = data?.data ?? [];

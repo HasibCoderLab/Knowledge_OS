@@ -24,6 +24,7 @@ import ReadingSessionForm from '../../features/reading/components/ReadingSession
 import type { ReadingSessionFormData } from '../../features/reading/components/ReadingSessionForm';
 import JournalForm from '../../features/journal/components/JournalForm';
 import type { JournalFormData } from '../../features/journal/components/JournalForm';
+import { useToastStore } from '../../store/toastStore';
 
 export const Dashboard: React.FC = () => {
   const queryClient = useQueryClient();
@@ -37,15 +38,15 @@ export const Dashboard: React.FC = () => {
 
   const { data: books, isLoading: booksLoading } = useQuery({
     queryKey: ['books'],
-    queryFn: () => libraryApi.getAll({ limit: 1000 }),
+    queryFn: () => libraryApi.getAll({ limit: 100 }),
   });
   const { data: habits, isLoading: habitsLoading } = useQuery({
     queryKey: ['habits'],
-    queryFn: () => habitsApi.getAll({ limit: 1000 }),
+    queryFn: () => habitsApi.getAll({ limit: 100 }),
   });
   const { data: goals, isLoading: goalsLoading } = useQuery({
     queryKey: ['goals'],
-    queryFn: () => goalsApi.getAll({ limit: 1000 }),
+    queryFn: () => goalsApi.getAll({ limit: 100 }),
   });
 
   if (booksLoading || habitsLoading || goalsLoading) {
@@ -265,19 +266,25 @@ export const Dashboard: React.FC = () => {
           <GoalForm
             onSave={async (data: GoalFormData) => {
               setIsSaving(true);
-              await goalsApi.create({
-                title: data.title,
-                description: data.description,
-                category: data.type,
-                targetDate: data.deadline,
-                status: data.status === 'active' ? 'IN_PROGRESS' : data.status === 'completed' ? 'COMPLETED' : 'COMPLETED',
-                priority: data.priority,
-                currentValue: data.progress,
-                targetValue: 100,
-              });
-              setIsSaving(false);
-              setCreating(null);
-              invalidate([['goals']]);
+              try {
+                await goalsApi.create({
+                  title: data.title,
+                  description: data.description,
+                  category: data.type,
+                  targetDate: data.deadline,
+                  status: data.status === 'active' ? 'IN_PROGRESS' : data.status === 'completed' ? 'COMPLETED' : 'COMPLETED',
+                  priority: data.priority,
+                  currentValue: data.progress,
+                  targetValue: 100,
+                });
+                useToastStore.getState().addToast({ title: 'Goal created', type: 'success' });
+                setCreating(null);
+                invalidate([['goals']]);
+              } catch {
+                useToastStore.getState().addToast({ title: 'Failed to create goal', description: 'Please try again', type: 'error' });
+              } finally {
+                setIsSaving(false);
+              }
             }}
             onCancel={() => setCreating(null)}
             isSaving={isSaving}
@@ -287,10 +294,16 @@ export const Dashboard: React.FC = () => {
           <TaskForm
             onSave={async (data: TaskFormData) => {
               setIsSaving(true);
-              await tasksApi.create({ ...data, status: 'TODO' } as unknown as Record<string, unknown>);
-              setIsSaving(false);
-              setCreating(null);
-              invalidate([['tasks']]);
+              try {
+                await tasksApi.create({ ...data, status: 'TODO' } as unknown as Record<string, unknown>);
+                useToastStore.getState().addToast({ title: 'Task created', type: 'success' });
+                setCreating(null);
+                invalidate([['tasks']]);
+              } catch {
+                useToastStore.getState().addToast({ title: 'Failed to create task', description: 'Please try again', type: 'error' });
+              } finally {
+                setIsSaving(false);
+              }
             }}
             onCancel={() => setCreating(null)}
             isSaving={isSaving}
@@ -300,10 +313,16 @@ export const Dashboard: React.FC = () => {
           <HabitForm
             onSave={async (data: HabitFormData) => {
               setIsSaving(true);
-              await habitsApi.create(data as unknown as Record<string, unknown>);
-              setIsSaving(false);
-              setCreating(null);
-              invalidate([['habits'], ['habitStats']]);
+              try {
+                await habitsApi.create(data as unknown as Record<string, unknown>);
+                useToastStore.getState().addToast({ title: 'Habit created', type: 'success' });
+                setCreating(null);
+                invalidate([['habits'], ['habitStats']]);
+              } catch {
+                useToastStore.getState().addToast({ title: 'Failed to create habit', description: 'Please try again', type: 'error' });
+              } finally {
+                setIsSaving(false);
+              }
             }}
             onCancel={() => setCreating(null)}
             isSaving={isSaving}
@@ -313,22 +332,28 @@ export const Dashboard: React.FC = () => {
           <BookForm
             onSave={async (data: BookFormData) => {
               setIsSaving(true);
-              await libraryApi.create({
-                title: data.title,
-                author: data.author,
-                category: data.category,
-                coverUrl: data.coverUrl,
-                status: data.status,
-                totalPages: data.totalPages,
-                currentPage: data.currentPage,
-                startDate: data.startDate,
-                finishDate: data.finishDate,
-                rating: data.rating,
-                tags: data.tags,
-              });
-              setIsSaving(false);
-              setCreating(null);
-              invalidate([['books']]);
+              try {
+                await libraryApi.create({
+                  title: data.title,
+                  author: data.author,
+                  category: data.category,
+                  coverUrl: data.coverUrl,
+                  status: data.status,
+                  totalPages: data.totalPages,
+                  currentPage: data.currentPage,
+                  startDate: data.startDate,
+                  finishDate: data.finishDate,
+                  rating: data.rating,
+                  tags: data.tags,
+                });
+                useToastStore.getState().addToast({ title: 'Book created', type: 'success' });
+                setCreating(null);
+                invalidate([['books']]);
+              } catch {
+                useToastStore.getState().addToast({ title: 'Failed to create book', description: 'Please try again', type: 'error' });
+              } finally {
+                setIsSaving(false);
+              }
             }}
             onCancel={() => setCreating(null)}
             isSaving={isSaving}
@@ -339,17 +364,23 @@ export const Dashboard: React.FC = () => {
             books={(books?.data as Book[]) ?? []}
             onSave={async (data: ReadingSessionFormData) => {
               setIsSaving(true);
-              await readingApi.create({
-                bookId: data.bookId,
-                date: data.date,
-                pagesRead: data.pagesRead,
-                durationMinutes: data.durationMinutes,
-                startPage: data.startPage,
-                endPage: data.endPage,
-              });
-              setIsSaving(false);
-              setCreating(null);
-              invalidate([['readingSessions'], ['books']]);
+              try {
+                await readingApi.create({
+                  bookId: data.bookId,
+                  date: data.date,
+                  pagesRead: data.pagesRead,
+                  durationMinutes: data.durationMinutes,
+                  startPage: data.startPage,
+                  endPage: data.endPage,
+                });
+                useToastStore.getState().addToast({ title: 'Reading session logged', type: 'success' });
+                setCreating(null);
+                invalidate([['readingSessions'], ['books']]);
+              } catch {
+                useToastStore.getState().addToast({ title: 'Failed to log session', description: 'Please try again', type: 'error' });
+              } finally {
+                setIsSaving(false);
+              }
             }}
             onCancel={() => setCreating(null)}
             isSaving={isSaving}
@@ -359,16 +390,22 @@ export const Dashboard: React.FC = () => {
           <JournalForm
             onSave={async (data: JournalFormData) => {
               setIsSaving(true);
-              await journalApi.create({
-                title: data.title,
-                content: data.content,
-                mood: data.mood,
-                date: data.date,
-                tags: data.tags,
-              });
-              setIsSaving(false);
-              setCreating(null);
-              invalidate([['journal']]);
+              try {
+                await journalApi.create({
+                  title: data.title,
+                  content: data.content,
+                  mood: data.mood,
+                  date: data.date,
+                  tags: data.tags,
+                });
+                useToastStore.getState().addToast({ title: 'Journal entry created', type: 'success' });
+                setCreating(null);
+                invalidate([['journal']]);
+              } catch {
+                useToastStore.getState().addToast({ title: 'Failed to create entry', description: 'Please try again', type: 'error' });
+              } finally {
+                setIsSaving(false);
+              }
             }}
             onCancel={() => setCreating(null)}
             isSaving={isSaving}

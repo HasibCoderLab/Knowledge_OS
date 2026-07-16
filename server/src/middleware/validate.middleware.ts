@@ -5,43 +5,56 @@ import { ValidationError } from '../shared/errors.js';
 export function validate(schema: ZodSchema) {
   return (req: Request, _res: Response, next: NextFunction): void => {
     const result = schema.safeParse(req.body);
+
     if (!result.success) {
-      const formatted = result.error.issues.map((issue) => ({
-        path: issue.path.join('.'),
-        message: issue.message,
-      }));
-      throw new ValidationError(formatted);
+      throw new ValidationError(
+        result.error.issues.map((issue) => ({
+          path: issue.path.join('.'),
+          message: issue.message,
+        }))
+      );
     }
+
     req.body = result.data;
     next();
   };
 }
 
 export function validateQuery(schema: ZodSchema) {
-  return (req: Request, _res: Response, next: NextFunction): void => {
+  return (req: Request, res: Response, next: NextFunction): void => {
     const result = schema.safeParse(req.query);
+
     if (!result.success) {
-      const formatted = result.error.issues.map((issue) => ({
-        path: issue.path.join('.'),
-        message: issue.message,
-      }));
-      throw new ValidationError(formatted);
+      throw new ValidationError(
+        result.error.issues.map((issue) => ({
+          path: issue.path.join('.'),
+          message: issue.message,
+        }))
+      );
     }
-    req.query = result.data as typeof req.query;
+
+    // ✅ Don't overwrite req.query
+    res.locals.validatedQuery = result.data;
+
     next();
   };
 }
 
 export function validateParams(schema: ZodSchema) {
-  return (req: Request, _res: Response, next: NextFunction): void => {
+  return (req: Request, res: Response, next: NextFunction): void => {
     const result = schema.safeParse(req.params);
+
     if (!result.success) {
-      const formatted = result.error.issues.map((issue) => ({
-        path: issue.path.join('.'),
-        message: issue.message,
-      }));
-      throw new ValidationError(formatted);
+      throw new ValidationError(
+        result.error.issues.map((issue) => ({
+          path: issue.path.join('.'),
+          message: issue.message,
+        }))
+      );
     }
+
+    res.locals.validatedParams = result.data;
+
     next();
   };
 }

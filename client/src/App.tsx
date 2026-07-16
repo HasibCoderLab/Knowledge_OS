@@ -21,6 +21,7 @@ const Analytics = lazy(() => import('./pages/analytics/Analytics').then(m => ({ 
 const CalendarPage = lazy(() => import('./pages/calendar/Calendar').then(m => ({ default: m.CalendarPage })));
 const Profile = lazy(() => import('./pages/profile/Profile').then(m => ({ default: m.Profile })));
 const SettingsPage = lazy(() => import('./pages/settings/Settings').then(m => ({ default: m.SettingsPage })));
+const SettingsProfile = lazy(() => import('./pages/settings/SettingsProfile').then(m => ({ default: m.SettingsProfilePage })));
 const Search = lazy(() => import('./pages/search/Search').then(m => ({ default: m.Search })));
 const Notifications = lazy(() => import('./pages/notifications/Notifications').then(m => ({ default: m.Notifications })));
 const DocsPage = lazy(() => import('./pages/docs/DocsPage').then(m => ({ default: m.DocsPage })));
@@ -125,6 +126,7 @@ function App() {
                 <Route path="/analytics" element={<Analytics />} />
                 <Route path="/calendar" element={<CalendarPage />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/settings/profile" element={<SettingsProfile />} />
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/search" element={<Search />} />
                 <Route path="/notifications" element={<Notifications />} />

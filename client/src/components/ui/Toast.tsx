@@ -17,6 +17,13 @@ const colorMap = {
   info: 'bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-300',
 };
 
+const barColorMap = {
+  success: 'bg-emerald-400 dark:bg-emerald-500',
+  error: 'bg-red-400 dark:bg-red-500',
+  warning: 'bg-amber-400 dark:bg-amber-500',
+  info: 'bg-blue-400 dark:bg-blue-500',
+};
+
 const toastVariants = {
   initial: { opacity: 0, x: 80, scale: 0.92 },
   animate: {
@@ -51,24 +58,32 @@ const ToastContainer: React.FC = () => {
               initial="initial"
               animate="animate"
               exit="exit"
-              className={`flex items-start gap-3 px-4 py-3.5 rounded-xl border shadow-lg pointer-events-auto ${colorClass}`}
+              className={`relative overflow-hidden rounded-xl border shadow-lg pointer-events-auto ${colorClass}`}
               role="alert"
               layout
             >
-              <Icon size={18} className="shrink-0 mt-0.5" strokeWidth={2} />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold">{toast.title}</p>
-                {toast.description && (
-                  <p className="text-xs mt-0.5 opacity-80">{toast.description}</p>
-                )}
+              <div className="flex items-start gap-3 px-4 pt-3.5 pb-3">
+                <Icon size={18} className="shrink-0 mt-0.5" strokeWidth={2} />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold">{toast.title}</p>
+                  {toast.description && (
+                    <p className="text-xs mt-0.5 opacity-80">{toast.description}</p>
+                  )}
+                </div>
+                <button
+                  onClick={() => removeToast(toast.id)}
+                  className="shrink-0 p-0.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer"
+                  aria-label="Dismiss"
+                >
+                  <X size={14} />
+                </button>
               </div>
-              <button
-                onClick={() => removeToast(toast.id)}
-                className="shrink-0 p-0.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer"
-                aria-label="Dismiss"
-              >
-                <X size={14} />
-              </button>
+              <motion.div
+                initial={{ scaleX: 1 }}
+                animate={{ scaleX: 0 }}
+                transition={{ duration: (toast.duration ?? 4000) / 1000, ease: 'linear' }}
+                className={`h-0.5 origin-left ${barColorMap[toast.type as keyof typeof barColorMap]}`}
+              />
             </motion.div>
           );
         })}

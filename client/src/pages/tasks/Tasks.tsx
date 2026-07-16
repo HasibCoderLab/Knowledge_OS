@@ -34,7 +34,7 @@ export const Tasks: React.FC = () => {
 
   const { data, isLoading } = useQuery({
     queryKey: ['tasks'],
-    queryFn: () => tasksApi.getAll({ limit: 1000 }),
+    queryFn: () => tasksApi.getAll({ limit: 100 }),
   });
 
   const tasks: Task[] = (data?.data ?? []).map((t: Record<string, unknown>) => ({

@@ -109,9 +109,11 @@ const BookCard: React.FC<BookCardProps> = ({ book, onClick, index = 0 }) => {
           )}
 
           <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100 dark:border-slate-800">
-            <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-              {book.category}
-            </span>
+            {book.category && (
+              <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                {book.category}
+              </span>
+            )}
             {book.tags && book.tags.length > 0 && (
               <span className="text-[10px] text-slate-400 dark:text-slate-500">
                 {book.tags.slice(0, 2).join(', ')}

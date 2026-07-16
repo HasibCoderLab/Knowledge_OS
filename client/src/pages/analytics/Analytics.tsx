@@ -78,10 +78,10 @@ export const Analytics: React.FC = () => {
     knowledgeScore: useQuery({ queryKey: ['knowledgeScore'], queryFn: () => ({ data: [] as KnowledgeScoreBreakdown[] }) }),
     learningHeatmap: useQuery({ queryKey: ['learningHeatmap'], queryFn: () => ({ data: [] }) }),
     heatmap: useQuery({ queryKey: ['heatmap'], queryFn: () => ({ data: [] }) }),
-    journal: useQuery({ queryKey: ['journal'], queryFn: () => journalApi.getAll({ limit: 1000 }) }),
-    tasks: useQuery({ queryKey: ['tasks'], queryFn: () => tasksApi.getAll({ limit: 1000 }) }),
-    habits: useQuery({ queryKey: ['habits'], queryFn: () => habitsApi.getAll({ limit: 1000 }) }),
-    goals: useQuery({ queryKey: ['goals'], queryFn: () => goalsApi.getAll({ limit: 1000 }) }),
+    journal: useQuery({ queryKey: ['journal'], queryFn: () => journalApi.getAll({ limit: 100 }) }),
+    tasks: useQuery({ queryKey: ['tasks'], queryFn: () => tasksApi.getAll({ limit: 100 }) }),
+    habits: useQuery({ queryKey: ['habits'], queryFn: () => habitsApi.getAll({ limit: 100 }) }),
+    goals: useQuery({ queryKey: ['goals'], queryFn: () => goalsApi.getAll({ limit: 100 }) }),
   };
 
   const isLoading = Object.values(queries).some(q => q.isLoading);

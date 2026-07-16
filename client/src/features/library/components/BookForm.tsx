@@ -7,13 +7,13 @@ import type { Book } from '../../../types';
 export interface BookFormData {
   title: string;
   author: string;
-  category: string;
-  coverUrl: string;
+  category: string | null;
+  coverUrl: string | null;
   status: 'reading' | 'completed' | 'paused' | 'wishlist' | 'dropped';
   totalPages: number | null;
   currentPage: number;
-  startDate: string;
-  finishDate: string;
+  startDate: string | null;
+  finishDate: string | null;
   rating: number | null;
   tags: string[];
 }
@@ -62,13 +62,13 @@ const BookForm: React.FC<BookFormProps> = ({ book, onSave, onCancel, isSaving = 
     onSave({
       title: title.trim(),
       author: author.trim(),
-      category,
-      coverUrl: '',
+      category: category || null,
+      coverUrl: null,
       status,
       totalPages: totalPages ? Number(totalPages) : null,
-      currentPage: 0,
-      startDate: startDate ? new Date(startDate).toISOString() : '',
-      finishDate: finishDate ? new Date(finishDate).toISOString() : '',
+      currentPage: book?.currentPage ?? 0,
+      startDate: startDate ? new Date(startDate).toISOString() : null,
+      finishDate: finishDate ? new Date(finishDate).toISOString() : null,
       rating: rating ? Number(rating) : null,
       tags,
     });

@@ -49,7 +49,7 @@ export const Journal: React.FC = () => {
 
   const { data, isLoading } = useQuery({
     queryKey: ['journal'],
-    queryFn: () => journalApi.getAll({ limit: 1000 }),
+    queryFn: () => journalApi.getAll({ limit: 100 }),
   });
 
   const entries: JournalEntry[] = data?.data ?? [];

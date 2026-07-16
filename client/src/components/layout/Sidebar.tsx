@@ -22,7 +22,6 @@ import {
   Globe,
   X,
   ExternalLink,
-  BrainCircuit,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { useLanguage } from '../../i18n/useLanguage';
@@ -32,7 +31,6 @@ import knowledgeOSLogo from '../../assets/favicon.png';
 const mainNav = [
   { labelKey: 'sidebar.items.dashboard', icon: LayoutDashboard, path: '/dashboard' },
   { labelKey: 'sidebar.items.library', icon: BookOpen, path: '/library' },
-  { labelKey: 'sidebar.items.ai', icon: BrainCircuit, href: 'https://paathai-io.vercel.app/ai-room', external: true },
   { labelKey: 'sidebar.items.paathai', icon: ExternalLink, href: 'https://paathai-io.vercel.app', external: true },
   { labelKey: 'sidebar.items.notes', icon: FileText, path: '/notes' },
   { labelKey: 'sidebar.items.goals', icon: Target, path: '/goals' },
