@@ -8,6 +8,20 @@ export const updateProfileSchema = z.object({
   location: z.string().max(100).nullable().optional(),
   theme: z.enum(['light', 'dark', 'system']).optional(),
   language: z.string().min(2).max(10).optional(),
+  website: z.string().url('Invalid URL').nullable().optional(),
+  github: z.string().max(50).nullable().optional(),
+  linkedin: z.string().max(50).nullable().optional(),
+  twitter: z.string().max(50).nullable().optional(),
+});
+
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, 'Current password is required'),
+  newPassword: z.string().min(8, 'Password must be at least 8 characters').max(128),
+  confirmPassword: z.string().min(1, 'Please confirm your new password'),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: 'Passwords do not match',
+  path: ['confirmPassword'],
 });
 
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;

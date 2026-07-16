@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-  User, Mail, MapPin, Link, Settings, Camera, Save, X, ArrowLeft, GitBranch, MessageSquare,
+  User, Mail, MapPin, Link, Settings, Camera, Save, X, ArrowLeft, GitBranch, MessageSquare, Lock,
 } from 'lucide-react';
 import { useAuthStore, type AuthUser } from '../../store/authStore';
 import { settingsApi, type UserProfile } from '../../services/api/index';
@@ -30,6 +30,9 @@ interface SettingsProfileFormData {
   github: string;
   linkedin: string;
   twitter: string;
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
 }
 
 const initialFormData: SettingsProfileFormData = {
@@ -41,6 +44,9 @@ const initialFormData: SettingsProfileFormData = {
   github: '',
   linkedin: '',
   twitter: '',
+  currentPassword: '',
+  newPassword: '',
+  confirmPassword: '',
 };
 
 export const SettingsProfilePage: React.FC = () => {
@@ -52,6 +58,7 @@ export const SettingsProfilePage: React.FC = () => {
 
   const [formData, setFormData] = useState<SettingsProfileFormData>(initialFormData);
   const [isSaving, setIsSaving] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [errors, setErrors] = useState<Partial<SettingsProfileFormData>>({});
 
   const { data: profileData } = useQuery<UserProfile>({
@@ -120,6 +127,27 @@ export const SettingsProfilePage: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const validatePassword = (): boolean => {
+    const newErrors: Partial<SettingsProfileFormData> = {};
+
+    if (!formData.currentPassword) {
+      newErrors.currentPassword = 'Current password is required';
+    }
+
+    if (!formData.newPassword) {
+      newErrors.newPassword = 'New password is required';
+    } else if (formData.newPassword.length < 8) {
+      newErrors.newPassword = 'New password must be at least 8 characters';
+    }
+
+    if (formData.newPassword !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleChange = (field: keyof SettingsProfileFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
@@ -144,7 +172,7 @@ export const SettingsProfilePage: React.FC = () => {
       };
 
       const response = await settingsApi.update(updateData);
-      const updatedUser = response.data as UserProfile;
+      const updatedUser = response as UserProfile;
 
       const authUpdate: Partial<AuthUser> = {
         id: updatedUser.id,
@@ -172,6 +200,31 @@ export const SettingsProfilePage: React.FC = () => {
             ? err.message
             : 'Failed to update profile. Please try again.';
       addToast({ title: 'Update failed', description: message, type: 'error' });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (!validatePassword()) return;
+
+    setIsSaving(true);
+    try {
+      await settingsApi.changePassword({
+        currentPassword: formData.currentPassword,
+        newPassword: formData.newPassword,
+        confirmPassword: formData.confirmPassword,
+      });
+      addToast({ title: 'Password changed', type: 'success' });
+      navigate('/profile');
+    } catch (err: unknown) {
+      const message =
+        err && typeof err === 'object' && 'response' in err
+          ? ((err as { response: { data: { message: string } } }).response?.data?.message ?? 'Failed to change password')
+          : err instanceof Error
+            ? err.message
+            : 'Failed to change password. Please try again.';
+      addToast({ title: 'Change password failed', description: message, type: 'error' });
     } finally {
       setIsSaving(false);
     }
@@ -268,6 +321,48 @@ export const SettingsProfilePage: React.FC = () => {
         </Card>
       </motion.div>
 
+      {/* Change Password */}
+      <motion.div variants={fadeIn}>
+        <Card className="p-5 md:p-6">
+          <h2 className="text-sm font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+            <Lock size={16} className="text-red-500" />
+            Change Password
+          </h2>
+          <div className="space-y-4">
+            <Input
+              label="Current Password"
+              type="password"
+              value={formData.currentPassword}
+              onChange={(e) => handleChange('currentPassword', e.target.value)}
+              placeholder="Enter your current password"
+              error={errors.currentPassword}
+            />
+            <Input
+              label="New Password"
+              type="password"
+              value={formData.newPassword}
+              onChange={(e) => handleChange('newPassword', e.target.value)}
+              placeholder="Enter new password (min 8 characters)"
+              error={errors.newPassword}
+            />
+            <Input
+              label="Confirm New Password"
+              type="password"
+              value={formData.confirmPassword}
+              onChange={(e) => handleChange('confirmPassword', e.target.value)}
+              placeholder="Confirm your new password"
+              error={errors.confirmPassword}
+            />
+          </div>
+          <div className="flex justify-end pt-2">
+            <Button variant="primary" size="sm" onClick={handleChangePassword} isLoading={isSaving}>
+              <Save size={14} className="mr-1" />
+              Change Password
+            </Button>
+          </div>
+        </Card>
+      </motion.div>
+
       {/* About */}
       <motion.div variants={fadeIn}>
         <Card className="p-5 md:p-6">
@@ -356,6 +451,48 @@ export const SettingsProfilePage: React.FC = () => {
               onChange={(e) => handleChange('language' as keyof SettingsProfileFormData, e.target.value)}
               placeholder="en"
             />
+          </div>
+        </Card>
+      </motion.div>
+
+      {/* Change Password */}
+      <motion.div variants={fadeIn}>
+        <Card className="p-5 md:p-6">
+          <h2 className="text-sm font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+            <Lock size={16} className="text-red-500" />
+            Change Password
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Input
+              label="Current Password"
+              type="password"
+              value={formData.currentPassword}
+              onChange={(e) => handleChange('currentPassword', e.target.value)}
+              placeholder="Enter current password"
+              error={errors.currentPassword}
+            />
+            <Input
+              label="New Password"
+              type="password"
+              value={formData.newPassword}
+              onChange={(e) => handleChange('newPassword', e.target.value)}
+              placeholder="Enter new password (min 8 chars)"
+              error={errors.newPassword}
+            />
+            <Input
+              label="Confirm New Password"
+              type="password"
+              value={formData.confirmPassword}
+              onChange={(e) => handleChange('confirmPassword', e.target.value)}
+              placeholder="Confirm new password"
+              error={errors.confirmPassword}
+            />
+          </div>
+          <div className="mt-4">
+            <Button variant="outline" size="sm" onClick={handleChangePassword} isLoading={isChangingPassword}>
+              <Lock size={14} className="mr-1" />
+              Change Password
+            </Button>
           </div>
         </Card>
       </motion.div>

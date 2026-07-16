@@ -11,8 +11,18 @@ const app: Express = express();
 
 // Security
 app.use(helmet());
+
+// CORS — support comma-separated origins in dev
+const allowedOrigins = env.corsOrigin.split(',').map((o) => o.trim());
 app.use(cors({
-  origin: env.corsOrigin,
+  origin: (origin, cb) => {
+    // Allow requests with no origin (server-to-server, curl, etc.)
+    if (!origin || allowedOrigins.includes(origin) || env.nodeEnv === 'development') {
+      cb(null, true);
+    } else {
+      cb(null, false);
+    }
+  },
   credentials: true,
 }));
 app.use(cookieParser(env.cookieSecret));

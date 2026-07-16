@@ -19,10 +19,43 @@ export const usersRepository = {
     if (data.location !== undefined) updateData.location = data.location;
     if (data.theme !== undefined) updateData.theme = data.theme;
     if (data.language !== undefined) updateData.language = data.language;
+    if (data.website !== undefined) updateData.website = data.website;
+    if (data.github !== undefined) updateData.github = data.github;
+    if (data.linkedin !== undefined) updateData.linkedin = data.linkedin;
+    if (data.twitter !== undefined) updateData.twitter = data.twitter;
 
     return prisma.user.update({
       where: { id },
       data: updateData,
     });
+  },
+
+  async updatePassword(id: string, hashedPassword: string) {
+    return prisma.user.update({
+      where: { id },
+      data: { password: hashedPassword },
+    });
+  },
+
+  async clearData(id: string) {
+    await prisma.$transaction([
+      prisma.book.deleteMany({ where: { userId: id } }),
+      prisma.readingSession.deleteMany({ where: { userId: id } }),
+      prisma.journalEntry.deleteMany({ where: { userId: id } }),
+      prisma.goal.deleteMany({ where: { userId: id } }),
+      prisma.task.deleteMany({ where: { userId: id } }),
+      prisma.habit.deleteMany({ where: { userId: id } }),
+      prisma.calendarEvent.deleteMany({ where: { userId: id } }),
+      prisma.notification.deleteMany({ where: { userId: id } }),
+      prisma.activity.deleteMany({ where: { userId: id } }),
+      prisma.analyticsSnapshot.deleteMany({ where: { userId: id } }),
+      prisma.note.deleteMany({ where: { userId: id } }),
+      prisma.userSettings.deleteMany({ where: { userId: id } }),
+    ]);
+  },
+
+  async deleteAccount(id: string) {
+    await this.clearData(id);
+    return prisma.user.delete({ where: { id } });
   },
 };

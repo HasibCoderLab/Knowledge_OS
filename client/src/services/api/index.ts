@@ -121,9 +121,13 @@ export const habitsApi = {
 };
 
 export const settingsApi = {
-  get: () => api.get('/settings').then(unwrap) as Promise<{ data: UserProfile }>,
+  get: () => api.get('/settings').then(unwrap),
   update: (data: Record<string, unknown>) =>
-    api.patch('/settings', data).then(unwrap) as Promise<{ data: UserProfile }>,
+    api.patch('/settings', data).then(unwrap),
+  changePassword: (data: { currentPassword: string; newPassword: string; confirmPassword: string }) =>
+    api.patch('/users/me/password', data).then(unwrap),
+  clearData: () => api.delete('/users/me/data').then(unwrap),
+  deleteAccount: () => api.delete('/users/me').then(unwrap),
 };
 
 export const analyticsApi = {
