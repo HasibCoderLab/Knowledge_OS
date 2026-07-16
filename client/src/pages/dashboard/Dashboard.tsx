@@ -295,7 +295,13 @@ export const Dashboard: React.FC = () => {
             onSave={async (data: TaskFormData) => {
               setIsSaving(true);
               try {
-                await tasksApi.create({ ...data, status: 'TODO' } as unknown as Record<string, unknown>);
+                await tasksApi.create({
+                  title: data.title,
+                  description: data.description || null,
+                  priority: data.priority,
+                  status: 'TODO',
+                  dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : null,
+                });
                 useToastStore.getState().addToast({ title: 'Task created', type: 'success' });
                 setCreating(null);
                 invalidate([['tasks']]);

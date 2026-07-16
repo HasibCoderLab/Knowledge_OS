@@ -83,9 +83,12 @@ export const Tasks: React.FC = () => {
     setIsSaving(true);
     try {
       await tasksApi.create({
-        ...formData,
+        title: formData.title,
+        description: formData.description || null,
+        priority: formData.priority,
         status: 'TODO',
-      } as unknown as Record<string, unknown>);
+        dueDate: formData.dueDate ? new Date(formData.dueDate).toISOString() : null,
+      });
       useToastStore.getState().addToast({ title: 'Task created', type: 'success' });
       setIsCreating(false);
       invalidate();
@@ -100,7 +103,12 @@ export const Tasks: React.FC = () => {
     if (!editingTask) return;
     setIsSaving(true);
     try {
-      await tasksApi.update(editingTask.id, formData as unknown as Record<string, unknown>);
+      await tasksApi.update(editingTask.id, {
+        title: formData.title,
+        description: formData.description || null,
+        priority: formData.priority,
+        dueDate: formData.dueDate ? new Date(formData.dueDate).toISOString() : null,
+      });
       useToastStore.getState().addToast({ title: 'Task updated', type: 'success' });
       setEditingTask(null);
       invalidate();

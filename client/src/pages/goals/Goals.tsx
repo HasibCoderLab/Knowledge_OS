@@ -90,9 +90,9 @@ export const Goals: React.FC = () => {
     try {
       await goalsApi.create({
         title: formData.title,
-        description: formData.description,
+        description: formData.description || null,
         category: formData.type,
-        targetDate: formData.deadline,
+        targetDate: formData.deadline ? new Date(formData.deadline).toISOString() : null,
         status: STATUS_MAP[formData.status] || 'IN_PROGRESS',
         priority: formData.priority,
         currentValue: formData.progress,
@@ -114,9 +114,9 @@ export const Goals: React.FC = () => {
     try {
       await goalsApi.update(editingGoal.id, {
         title: formData.title,
-        description: formData.description,
+        description: formData.description || null,
         category: formData.type,
-        targetDate: formData.deadline,
+        targetDate: formData.deadline ? new Date(formData.deadline).toISOString() : null,
         status: STATUS_MAP[formData.status] || 'IN_PROGRESS',
         priority: formData.priority,
         currentValue: formData.progress,
