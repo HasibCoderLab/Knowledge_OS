@@ -9,7 +9,7 @@ function extract<T>(response: { data: { success: boolean; data: T; pagination?: 
 }
 
 export const authApi = {
-  register: (data: { name: string; email: string; password: string }) =>
+  register: (data: { name: string; email: string; password: string; username?: string }) =>
     api.post('/auth/register', data).then(unwrap),
   login: (data: { email: string; password: string }) =>
     api.post('/auth/login', data).then(unwrap),

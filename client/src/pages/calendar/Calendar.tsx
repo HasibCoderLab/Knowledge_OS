@@ -158,7 +158,10 @@ export const CalendarPage: React.FC = () => {
   const suggestions = q.suggestions.data?.data ?? [];
   const heatmap = q.heatmap.data?.data ?? [];
   const moods = q.moods.data?.data ?? [];
-  const tasks = (q.tasks.data?.data ?? []) as Array<{ isCompleted: boolean }>;
+  const tasks: Array<{ isCompleted: boolean }> = (q.tasks.data?.data ?? []).map((t: Record<string, unknown>) => ({
+    ...t,
+    isCompleted: (t.status as string) === 'DONE',
+  })) as Array<{ isCompleted: boolean }>;
 
   const todayMood = moods.find(m => m.date === todayStr);
 

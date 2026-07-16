@@ -6,6 +6,7 @@ import {
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import { useLanguage } from '../../i18n/useLanguage';
+import { useAuthStore } from '../../store/authStore';
 import type { SupportedLocale } from '../../i18n/locales';
 
 interface SectionHeaderProps {
@@ -28,8 +29,13 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({ icon, title, description 
 
 export const ProfileSection: React.FC = () => {
   const { t } = useLanguage();
-  const [name] = useState('John Doe');
-  const [username] = useState('johndoe');
+  const { user } = useAuthStore();
+  const [name, setName] = useState(user?.name ?? '');
+  const [username, setUsername] = useState(user?.username ?? '');
+
+  const initials = user?.name
+    ? user.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
+    : '?';
 
   return (
     <div>
@@ -38,26 +44,34 @@ export const ProfileSection: React.FC = () => {
         <div className="flex items-center gap-4">
           <div className="relative group">
             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center text-white text-lg font-bold shadow-md">
-              JD
+              {initials}
             </div>
             <button className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
               <Camera size={14} className="text-white" />
             </button>
           </div>
           <div>
-            <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{name}</p>
-            <p className="text-xs text-slate-500 dark:text-slate-400">@{username}</p>
+            <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{name || 'User'}</p>
+            {username && <p className="text-xs text-slate-500 dark:text-slate-400">@{username}</p>}
           </div>
         </div>
-        <Input label={t('settings.profile.name')} defaultValue={name} />
-        <Input label={t('settings.profile.username')} defaultValue={username} />
+        <Input
+          label={t('settings.profile.name')}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <Input
+          label={t('settings.profile.username')}
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
         <div>
           <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 block">{t('settings.profile.bio')}</label>
           <textarea
             className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none transition-all duration-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder:text-slate-400 dark:placeholder:text-slate-500"
             rows={3}
             placeholder="Tell us about yourself..."
-            defaultValue="Building the future of education in Bangladesh."
+            defaultValue={user?.bio ?? ''}
           />
         </div>
         <div className="flex justify-end pt-2">
@@ -70,12 +84,18 @@ export const ProfileSection: React.FC = () => {
 
 export const AccountSection: React.FC = () => {
   const { t } = useLanguage();
+  const { user } = useAuthStore();
 
   return (
     <div>
       <SectionHeader icon={<Shield size={20} />} title={t('settings.account.title')} description={t('settings.account.description')} />
       <div className="space-y-5">
-        <Input label={t('settings.account.email')} type="email" defaultValue="john@example.com" />
+        <Input
+          label={t('settings.account.email')}
+          type="email"
+          value={user?.email ?? ''}
+          disabled
+        />
         <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
           <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-3">{t('settings.account.password')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

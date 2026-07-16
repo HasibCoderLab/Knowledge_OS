@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState, useMemo, useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { BookOpen, Plus, TrendingUp, Target } from 'lucide-react';
 import { libraryApi, readingApi } from '../../services/api/index';
@@ -11,12 +11,16 @@ import EmptyState from '../../components/ui/EmptyState';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import Skeleton from '../../components/ui/Skeleton';
+import Modal from '../../components/ui/Modal';
+import BookForm from '../../features/library/components/BookForm';
 import type { Book, ReadingSession } from '../../types';
+import type { BookFormData } from '../../features/library/components/BookForm';
 
 const filterOptions = [
   { value: 'all', label: 'All Books' },
   { value: 'reading', label: 'Reading' },
   { value: 'completed', label: 'Completed' },
+  { value: 'paused', label: 'Paused' },
   { value: 'wishlist', label: 'Wishlist' },
 ];
 
@@ -26,8 +30,16 @@ const containerVariants = {
 };
 
 export const ReadingTracker: React.FC = () => {
+  const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('all');
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const invalidate = useCallback((keys: string[][]) => {
+    keys.forEach((key) => queryClient.invalidateQueries({ queryKey: key }));
+  }, [queryClient]);
+
   const { data: booksData, isLoading: booksLoading } = useQuery({
     queryKey: ['books'],
     queryFn: () => libraryApi.getAll({ limit: 1000 }),
@@ -35,11 +47,11 @@ export const ReadingTracker: React.FC = () => {
 
   const { data: sessionsData, isLoading: sessionsLoading } = useQuery({
     queryKey: ['readingSessions'],
-    queryFn: () => readingApi.getAll({ limit: 1000 }).then((r) => r.data),
+    queryFn: () => readingApi.getAll({ limit: 1000 }),
   });
 
   const books: Book[] = booksData?.data ?? [];
-  const sessions: ReadingSession[] = sessionsData ?? [];
+  const sessions: ReadingSession[] = sessionsData?.data ?? [];
 
   const stats = useMemo(() => {
     const completed = books.filter(b => b.status === 'completed').length;
@@ -48,11 +60,11 @@ export const ReadingTracker: React.FC = () => {
     const pagesToday = sessions
       .filter(s => s.date === todayStr)
       .reduce((sum, s) => sum + s.pagesRead, 0);
-    const streak = books.reduce((max, b) => {
+    const readingProgress = books.reduce((max, b) => {
       if (b.status === 'reading') return Math.max(max, Math.round((b.currentPage / b.totalPages) * 100));
       return max;
     }, 0);
-    return { completed, totalPagesRead, pagesToday, streak: streak > 0 ? 12 : 0 };
+    return { completed, totalPagesRead, pagesToday, streak: readingProgress };
   }, [books, sessions]);
 
   const filteredBooks = useMemo(() => {
@@ -71,10 +83,11 @@ export const ReadingTracker: React.FC = () => {
     const all = books.length;
     const reading = books.filter(b => b.status === 'reading').length;
     const completed = books.filter(b => b.status === 'completed').length;
+    const paused = books.filter(b => b.status === 'paused').length;
     const wishlist = books.filter(b => b.status === 'wishlist').length;
     return filterOptions.map(opt => ({
       ...opt,
-      count: opt.value === 'all' ? all : opt.value === 'reading' ? reading : opt.value === 'completed' ? completed : wishlist,
+      count: opt.value === 'all' ? all : opt.value === 'reading' ? reading : opt.value === 'completed' ? completed : opt.value === 'paused' ? paused : wishlist,
     }));
   }, [books]);
 
@@ -171,7 +184,7 @@ export const ReadingTracker: React.FC = () => {
           {searchQuery || activeFilter !== 'all' ? (
             <EmptyState icon={BookOpen} title="No books found" description="Try a different search or filter" />
           ) : (
-            <EmptyState icon={BookOpen} title="No books in your library" description="Add your first book to start tracking reading progress" actionLabel="Add Book" onAction={() => {}} />
+            <EmptyState icon={BookOpen} title="No books in your library" description="Add your first book to start tracking reading progress" actionLabel="Add Book" onAction={() => setIsAddModalOpen(true)} />
           )}
         </motion.div>
       ) : (
@@ -181,6 +194,32 @@ export const ReadingTracker: React.FC = () => {
           ))}
         </motion.div>
       )}
+
+      <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title="Add Book" size="md">
+        <BookForm
+          onSave={async (data: BookFormData) => {
+            setIsSaving(true);
+            await libraryApi.create({
+              title: data.title,
+              author: data.author,
+              category: data.category,
+              coverUrl: data.coverUrl,
+              status: data.status,
+              totalPages: data.totalPages,
+              currentPage: data.currentPage,
+              startDate: data.startDate,
+              finishDate: data.finishDate,
+              rating: data.rating,
+              tags: data.tags,
+            });
+            setIsSaving(false);
+            setIsAddModalOpen(false);
+            invalidate([['books']]);
+          }}
+          onCancel={() => setIsAddModalOpen(false)}
+          isSaving={isSaving}
+        />
+      </Modal>
     </motion.div>
   );
 };

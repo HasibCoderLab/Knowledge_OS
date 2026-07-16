@@ -1,11 +1,14 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   BookMarked, GitBranch, GitCommit, Keyboard, Megaphone, Info,
-  Globe, Check, Menu, ChevronDown,
+  Globe, Check, Menu, ChevronDown, User, Settings, LogOut,
 } from 'lucide-react';
 import { useLanguage } from '../../i18n/useLanguage';
+import { useAuthStore } from '../../store/authStore';
+import Avatar from '../ui/Avatar';
 import type { SupportedLocale } from '../../i18n/locales';
 
 interface TopNavbarProps {
@@ -182,6 +185,94 @@ const LanguageHoverSwitcher: React.FC = () => {
   );
 };
 
+const UserMenu: React.FC = () => {
+  const { user, logout } = useAuthStore();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const handleClickOutside = useCallback((e: MouseEvent) => {
+    if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [handleClickOutside]);
+
+  const handleLogout = async () => {
+    setOpen(false);
+    await logout(queryClient);
+    navigate('/auth/login', { replace: true });
+  };
+
+  if (!user) return null;
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-2 p-1 pr-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
+        aria-haspopup="true"
+        aria-expanded={open}
+      >
+        <Avatar src={user?.avatar} name={user?.name} size="sm" />
+        <span className="text-xs font-medium text-slate-700 dark:text-slate-300 hidden sm:block">
+          {user?.name?.split(' ')[0] ?? 'User'}
+        </span>
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -4, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -4, scale: 0.97 }}
+            transition={{ duration: 0.12, ease: 'easeOut' }}
+            className="absolute right-0 top-full mt-1.5 w-52 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-900/10 dark:shadow-black/30 overflow-hidden z-50"
+            role="menu"
+          >
+            <div className="p-1.5">
+              {/* User info header */}
+              <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800 mb-1">
+                <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{user.name}</p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{user.email}</p>
+              </div>
+
+              <button
+                onClick={() => { navigate('/profile'); setOpen(false); }}
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-all cursor-pointer"
+                role="menuitem"
+              >
+                <User size={14} strokeWidth={1.5} />
+                Profile
+              </button>
+              <button
+                onClick={() => { navigate('/settings'); setOpen(false); }}
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-all cursor-pointer"
+                role="menuitem"
+              >
+                <Settings size={14} strokeWidth={1.5} />
+                Settings
+              </button>
+              <div className="border-t border-slate-100 dark:border-slate-800 mt-1 pt-1">
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all cursor-pointer"
+                  role="menuitem"
+                >
+                  <LogOut size={14} strokeWidth={1.5} />
+                  Logout
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
 const TopNavbar: React.FC<TopNavbarProps> = ({ onMenuClick }) => {
   const { t } = useLanguage();
 
@@ -201,6 +292,7 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ onMenuClick }) => {
 
         <div className="flex items-center gap-1">
           <LanguageHoverSwitcher />
+          <UserMenu />
         </div>
       </div>
     </header>

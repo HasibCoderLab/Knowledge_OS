@@ -7,6 +7,7 @@ export interface AuthResponse {
 export interface UserResponse {
   id: string;
   name: string;
+  username: string | null;
   email: string;
   avatar: string | null;
   bio: string | null;

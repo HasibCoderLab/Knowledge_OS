@@ -42,10 +42,10 @@ export const Journal: React.FC = () => {
 
   const { data, isLoading } = useQuery({
     queryKey: ['journal'],
-    queryFn: () => journalApi.getAll({ limit: 1000 }).then((r) => r.data),
+    queryFn: () => journalApi.getAll({ limit: 1000 }),
   });
 
-  const entries: JournalEntry[] = data ?? [];
+  const entries: JournalEntry[] = data?.data ?? [];
 
   const stats = useMemo(() => {
     const total = entries.length;

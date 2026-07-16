@@ -6,10 +6,11 @@ import { env } from '../../app/config/environment.js';
 import type { RegisterInput, LoginInput } from './auth.validation.js';
 import type { AuthResponse, UserResponse } from './auth.types.js';
 
-function toUserResponse(user: { id: string; name: string; email: string; avatar: string | null; bio: string | null; location: string | null; theme: string; language: string; createdAt: Date }): UserResponse {
+function toUserResponse(user: { id: string; name: string; username?: string | null; email: string; avatar: string | null; bio: string | null; location: string | null; theme: string; language: string; createdAt: Date }): UserResponse {
   return {
     id: user.id,
     name: user.name,
+    username: user.username ?? null,
     email: user.email,
     avatar: user.avatar,
     bio: user.bio,
@@ -31,6 +32,7 @@ export const authService = {
 
     const user = await authRepository.create({
       name: input.name,
+      username: input.username ? input.username.toLowerCase() : undefined,
       email: input.email,
       password: hashedPassword,
     });

@@ -1,11 +1,13 @@
 export interface User {
   id: string;
   name: string;
+  username?: string;
   email: string;
   avatar: string;
   bio?: string;
   location?: string;
   joinedAt?: string;
+  createdAt?: string;
   preferences: {
     theme: 'light' | 'dark' | 'system';
     language: string;
@@ -29,7 +31,7 @@ export interface Book {
   author: string;
   category: string;
   coverUrl: string;
-  status: 'reading' | 'completed' | 'wishlist' | 'dropped';
+  status: 'reading' | 'completed' | 'paused' | 'wishlist' | 'dropped';
   totalPages: number;
   currentPage: number;
   startDate: string | null;

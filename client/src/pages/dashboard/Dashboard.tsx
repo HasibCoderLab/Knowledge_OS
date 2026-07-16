@@ -1,7 +1,8 @@
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { BookOpen, Target, Zap, Flame, ArrowUpRight, Plus, FileText, Lightbulb } from 'lucide-react';
-import { libraryApi, habitsApi, goalsApi } from '../../services/api/index';
+import React, { useState, useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useAuthStore } from '../../store/authStore';
+import { BookOpen, Target, Zap, Flame, ArrowUpRight, Plus, FileText, Lightbulb, BookMarked, CheckSquare } from 'lucide-react';
+import { libraryApi, habitsApi, goalsApi, readingApi, journalApi, tasksApi } from '../../services/api/index';
 import StatCard from '../../features/dashboard/components/StatCard';
 import type { Book, Goal } from '../../types';
 import ReadingProgressCard from '../../features/dashboard/components/ReadingProgressCard';
@@ -9,8 +10,31 @@ import HabitChecklist from '../../features/dashboard/components/HabitChecklist';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import Badge from '../../components/ui/Badge';
+import Dropdown from '../../components/ui/Dropdown';
+import Modal from '../../components/ui/Modal';
+import GoalForm from '../../features/goals/components/GoalForm';
+import type { GoalFormData } from '../../features/goals/components/GoalForm';
+import TaskForm from '../../features/tasks/components/TaskForm';
+import type { TaskFormData } from '../../features/tasks/components/TaskForm';
+import HabitForm from '../../features/habits/components/HabitForm';
+import type { HabitFormData } from '../../features/habits/components/HabitForm';
+import BookForm from '../../features/library/components/BookForm';
+import type { BookFormData } from '../../features/library/components/BookForm';
+import ReadingSessionForm from '../../features/reading/components/ReadingSessionForm';
+import type { ReadingSessionFormData } from '../../features/reading/components/ReadingSessionForm';
+import JournalForm from '../../features/journal/components/JournalForm';
+import type { JournalFormData } from '../../features/journal/components/JournalForm';
 
 export const Dashboard: React.FC = () => {
+  const queryClient = useQueryClient();
+  const { user } = useAuthStore();
+  const [creating, setCreating] = useState<'book' | 'reading' | 'journal' | 'goal' | 'task' | 'habit' | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const invalidate = useCallback((keys: string[][]) => {
+    keys.forEach((key) => queryClient.invalidateQueries({ queryKey: key }));
+  }, [queryClient]);
+
   const { data: books, isLoading: booksLoading } = useQuery({
     queryKey: ['books'],
     queryFn: () => libraryApi.getAll({ limit: 1000 }),
@@ -46,17 +70,25 @@ export const Dashboard: React.FC = () => {
             Dashboard
           </h2>
           <p className="text-sm md:text-[15px] text-slate-500 dark:text-slate-400 mt-1">
-            Welcome back, John. Here's your growth summary.
+            Welcome back, {user?.name?.split(' ')[0] ?? 'there'}. Here's your growth summary.
           </p>
         </div>
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
-          <Button variant="outline" size="sm" className="gap-2">
-            <Zap size={14} /> Quick Action
-          </Button>
-          <Button variant="primary" size="sm" className="gap-2">
-            <Plus size={14} /> New Entry
-          </Button>
-        </div>
+        <Dropdown
+          trigger={
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-xl transition-colors">
+              <Plus size={16} /> Create
+            </span>
+          }
+          align="right"
+          items={[
+            { label: 'Book', icon: <BookOpen size={15} />, onClick: () => setCreating('book') },
+            { label: 'Reading Session', icon: <BookMarked size={15} />, onClick: () => setCreating('reading') },
+            { label: 'Journal', icon: <FileText size={15} />, onClick: () => setCreating('journal') },
+            { label: 'Goal', icon: <Target size={15} />, onClick: () => setCreating('goal') },
+            { label: 'Task', icon: <CheckSquare size={15} />, onClick: () => setCreating('task') },
+            { label: 'Habit', icon: <Zap size={15} />, onClick: () => setCreating('habit') },
+          ]}
+        />
       </header>
 
       {/* Stats Row */}
@@ -159,19 +191,28 @@ export const Dashboard: React.FC = () => {
             <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-1">Quick Actions</h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">Rapid entry for your OS</p>
             <div className="grid grid-cols-1 gap-2.5">
-              <button className="flex items-center gap-3 px-3.5 py-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-medium text-slate-700 dark:text-slate-300 transition-all duration-200 cursor-pointer group border border-slate-100 dark:border-slate-800">
+              <button
+                onClick={() => setCreating('book')}
+                className="flex items-center gap-3 px-3.5 py-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-medium text-slate-700 dark:text-slate-300 transition-all duration-200 cursor-pointer group border border-slate-100 dark:border-slate-800"
+              >
                 <div className="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 group-hover:scale-105 transition-transform">
                   <BookOpen size={15} strokeWidth={2} />
                 </div>
                 Add New Book
               </button>
-              <button className="flex items-center gap-3 px-3.5 py-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-medium text-slate-700 dark:text-slate-300 transition-all duration-200 cursor-pointer group border border-slate-100 dark:border-slate-800">
+              <button
+                onClick={() => setCreating('journal')}
+                className="flex items-center gap-3 px-3.5 py-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-medium text-slate-700 dark:text-slate-300 transition-all duration-200 cursor-pointer group border border-slate-100 dark:border-slate-800"
+              >
                 <div className="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 group-hover:scale-105 transition-transform">
                   <FileText size={15} strokeWidth={2} />
                 </div>
                 Create New Note
               </button>
-              <button className="flex items-center gap-3 px-3.5 py-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-medium text-slate-700 dark:text-slate-300 transition-all duration-200 cursor-pointer group border border-slate-100 dark:border-slate-800">
+              <button
+                onClick={() => setCreating('goal')}
+                className="flex items-center gap-3 px-3.5 py-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-medium text-slate-700 dark:text-slate-300 transition-all duration-200 cursor-pointer group border border-slate-100 dark:border-slate-800"
+              >
                 <div className="p-1.5 rounded-lg bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 group-hover:scale-105 transition-transform">
                   <Target size={15} strokeWidth={2} />
                 </div>
@@ -206,6 +247,134 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <Modal
+        isOpen={!!creating}
+        onClose={() => setCreating(null)}
+        title={
+          creating === 'book' ? 'Create Book' :
+          creating === 'reading' ? 'Log Reading Session' :
+          creating === 'journal' ? 'Create Journal Entry' :
+          creating === 'goal' ? 'Create Goal' :
+          creating === 'task' ? 'Create Task' :
+          creating === 'habit' ? 'Create Habit' : ''
+        }
+        size="md"
+      >
+        {creating === 'goal' && (
+          <GoalForm
+            onSave={async (data: GoalFormData) => {
+              setIsSaving(true);
+              await goalsApi.create({
+                title: data.title,
+                description: data.description,
+                category: data.type,
+                targetDate: data.deadline,
+                status: data.status === 'active' ? 'IN_PROGRESS' : data.status === 'completed' ? 'COMPLETED' : 'COMPLETED',
+                priority: data.priority,
+                currentValue: data.progress,
+                targetValue: 100,
+              });
+              setIsSaving(false);
+              setCreating(null);
+              invalidate([['goals']]);
+            }}
+            onCancel={() => setCreating(null)}
+            isSaving={isSaving}
+          />
+        )}
+        {creating === 'task' && (
+          <TaskForm
+            onSave={async (data: TaskFormData) => {
+              setIsSaving(true);
+              await tasksApi.create({ ...data, status: 'TODO' } as unknown as Record<string, unknown>);
+              setIsSaving(false);
+              setCreating(null);
+              invalidate([['tasks']]);
+            }}
+            onCancel={() => setCreating(null)}
+            isSaving={isSaving}
+          />
+        )}
+        {creating === 'habit' && (
+          <HabitForm
+            onSave={async (data: HabitFormData) => {
+              setIsSaving(true);
+              await habitsApi.create(data as unknown as Record<string, unknown>);
+              setIsSaving(false);
+              setCreating(null);
+              invalidate([['habits'], ['habitStats']]);
+            }}
+            onCancel={() => setCreating(null)}
+            isSaving={isSaving}
+          />
+        )}
+        {creating === 'book' && (
+          <BookForm
+            onSave={async (data: BookFormData) => {
+              setIsSaving(true);
+              await libraryApi.create({
+                title: data.title,
+                author: data.author,
+                category: data.category,
+                coverUrl: data.coverUrl,
+                status: data.status,
+                totalPages: data.totalPages,
+                currentPage: data.currentPage,
+                startDate: data.startDate,
+                finishDate: data.finishDate,
+                rating: data.rating,
+                tags: data.tags,
+              });
+              setIsSaving(false);
+              setCreating(null);
+              invalidate([['books']]);
+            }}
+            onCancel={() => setCreating(null)}
+            isSaving={isSaving}
+          />
+        )}
+        {creating === 'reading' && (
+          <ReadingSessionForm
+            books={(books?.data as Book[]) ?? []}
+            onSave={async (data: ReadingSessionFormData) => {
+              setIsSaving(true);
+              await readingApi.create({
+                bookId: data.bookId,
+                date: data.date,
+                pagesRead: data.pagesRead,
+                durationMinutes: data.durationMinutes,
+                startPage: data.startPage,
+                endPage: data.endPage,
+              });
+              setIsSaving(false);
+              setCreating(null);
+              invalidate([['readingSessions'], ['books']]);
+            }}
+            onCancel={() => setCreating(null)}
+            isSaving={isSaving}
+          />
+        )}
+        {creating === 'journal' && (
+          <JournalForm
+            onSave={async (data: JournalFormData) => {
+              setIsSaving(true);
+              await journalApi.create({
+                title: data.title,
+                content: data.content,
+                mood: data.mood,
+                date: data.date,
+                tags: data.tags,
+              });
+              setIsSaving(false);
+              setCreating(null);
+              invalidate([['journal']]);
+            }}
+            onCancel={() => setCreating(null)}
+            isSaving={isSaving}
+          />
+        )}
+      </Modal>
     </div>
   );
 };

@@ -9,6 +9,7 @@ export const usersRepository = {
   async update(id: string, data: UpdateProfileInput) {
     const updateData: Record<string, unknown> = {};
     if (data.name !== undefined) updateData.name = data.name;
+    if (data.username !== undefined) updateData.username = data.username.toLowerCase();
     if (data.avatar !== undefined) updateData.avatar = data.avatar;
     if (data.bio !== undefined) updateData.bio = data.bio;
     if (data.location !== undefined) updateData.location = data.location;

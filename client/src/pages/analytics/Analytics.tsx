@@ -99,8 +99,14 @@ export const Analytics: React.FC = () => {
   const learningHeatmap = queries.learningHeatmap.data?.data ?? [];
   const heatmapData = queries.heatmap.data?.data ?? [];
   const journalEntries = queries.journal.data?.data ?? [];
-  const tasks: Array<{ isCompleted: boolean; streak?: number }> = queries.tasks.data?.data ?? [];
-  const habits: Array<{ streak: number }> = queries.habits.data?.data ?? [];
+  const tasks: Array<{ isCompleted: boolean; streak?: number }> = (queries.tasks.data?.data ?? []).map((t: Record<string, unknown>) => ({
+    ...t,
+    isCompleted: (t.status as string) === 'DONE',
+  })) as Array<{ isCompleted: boolean; streak?: number }>;
+  const habits: Array<{ streak: number }> = (queries.habits.data?.data ?? []).map((h: Record<string, unknown>) => ({
+    ...h,
+    streak: (h.currentStreak as number) || 0,
+  })) as Array<{ streak: number }>;
   const goals = queries.goals.data?.data ?? [];
 
   const totalActions = activity.reduce((sum, d) => sum + d.value, 0);

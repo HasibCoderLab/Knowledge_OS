@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState, useMemo, useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { BookOpen, Plus, Star, Clock } from 'lucide-react';
 import { libraryApi } from '../../services/api/index';
@@ -10,12 +10,15 @@ import Button from '../../components/ui/Button';
 import Modal from '../../components/ui/Modal';
 import Skeleton from '../../components/ui/Skeleton';
 import Badge from '../../components/ui/Badge';
+import BookForm from '../../features/library/components/BookForm';
 import type { Book } from '../../types';
+import type { BookFormData } from '../../features/library/components/BookForm';
 
 const filterOptions = [
   { value: 'all', label: 'All' },
   { value: 'reading', label: 'Reading' },
   { value: 'completed', label: 'Completed' },
+  { value: 'paused', label: 'Paused' },
   { value: 'wishlist', label: 'Wishlist' },
   { value: 'dropped', label: 'Dropped' },
 ];
@@ -23,14 +26,22 @@ const filterOptions = [
 const statusBadgeConfig = {
   reading: { label: 'Reading', variant: 'info' as const },
   completed: { label: 'Completed', variant: 'success' as const },
-  wishlist: { label: 'Wishlist', variant: 'warning' as const },
+  paused: { label: 'Paused', variant: 'warning' as const },
+  wishlist: { label: 'Wishlist', variant: 'default' as const },
   dropped: { label: 'Dropped', variant: 'danger' as const },
 };
 
 export const Library: React.FC = () => {
+  const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('all');
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const invalidate = useCallback((keys: string[][]) => {
+    keys.forEach((key) => queryClient.invalidateQueries({ queryKey: key }));
+  }, [queryClient]);
 
   const { data, isLoading } = useQuery({
     queryKey: ['books'],
@@ -57,9 +68,10 @@ export const Library: React.FC = () => {
     const all = books.length;
     const reading = books.filter((b) => b.status === 'reading').length;
     const completed = books.filter((b) => b.status === 'completed').length;
+    const paused = books.filter((b) => b.status === 'paused').length;
     const wishlist = books.filter((b) => b.status === 'wishlist').length;
     const dropped = books.filter((b) => b.status === 'dropped').length;
-    return { all, reading, completed, wishlist, dropped };
+    return { all, reading, completed, paused, wishlist, dropped };
   }, [books]);
 
   const filterOptionsWithCounts = filterOptions.map((opt) => ({
@@ -119,7 +131,7 @@ export const Library: React.FC = () => {
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">Library</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5">{books.length} {books.length === 1 ? 'book' : 'books'} in your library</p>
         </div>
-        <Button size="sm" className="gap-2 shrink-0"><Plus size={16} /> Add Book</Button>
+        <Button size="sm" className="gap-2 shrink-0" onClick={() => setIsAddModalOpen(true)}><Plus size={16} /> Add Book</Button>
       </motion.header>
 
       <motion.div
@@ -137,7 +149,7 @@ export const Library: React.FC = () => {
           {searchQuery ? (
             <EmptyState icon={BookOpen} title="No books found" description="Try a different search term" />
           ) : (
-            <EmptyState icon={BookOpen} title="No books found" description="Add your first book to get started" actionLabel="Add Book" onAction={() => {}} />
+            <EmptyState icon={BookOpen} title="No books found" description="Add your first book to get started" actionLabel="Add Book" onAction={() => setIsAddModalOpen(true)} />
           )}
         </motion.div>
       ) : (
@@ -231,6 +243,32 @@ export const Library: React.FC = () => {
           </Modal>
         );
       })()}
+
+      <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title="Add Book" size="md">
+        <BookForm
+          onSave={async (data: BookFormData) => {
+            setIsSaving(true);
+            await libraryApi.create({
+              title: data.title,
+              author: data.author,
+              category: data.category,
+              coverUrl: data.coverUrl,
+              status: data.status,
+              totalPages: data.totalPages,
+              currentPage: data.currentPage,
+              startDate: data.startDate,
+              finishDate: data.finishDate,
+              rating: data.rating,
+              tags: data.tags,
+            });
+            setIsSaving(false);
+            setIsAddModalOpen(false);
+            invalidate([['books']]);
+          }}
+          onCancel={() => setIsAddModalOpen(false)}
+          isSaving={isSaving}
+        />
+      </Modal>
     </motion.div>
   );
 };

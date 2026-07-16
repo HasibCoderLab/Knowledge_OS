@@ -12,7 +12,8 @@ interface BookCardProps {
 const statusConfig = {
   reading: { label: 'Reading', dot: 'bg-emerald-500', text: 'text-emerald-600 dark:text-emerald-400' },
   completed: { label: 'Completed', dot: 'bg-blue-500', text: 'text-blue-600 dark:text-blue-400' },
-  wishlist: { label: 'Wishlist', dot: 'bg-amber-500', text: 'text-amber-600 dark:text-amber-400' },
+  paused: { label: 'Paused', dot: 'bg-amber-500', text: 'text-amber-600 dark:text-amber-400' },
+  wishlist: { label: 'Wishlist', dot: 'bg-slate-400', text: 'text-slate-500 dark:text-slate-400' },
   dropped: { label: 'Dropped', dot: 'bg-slate-400', text: 'text-slate-500 dark:text-slate-400' },
 };
 

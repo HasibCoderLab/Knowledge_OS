@@ -10,16 +10,17 @@ interface BookshelfCardProps {
   onClick?: () => void;
 }
 
-const statusConfig = {
+const statusConfig: Record<string, { label: string; dot: string; text: string }> = {
   reading: { label: 'Reading', dot: 'bg-emerald-500', text: 'text-emerald-600 dark:text-emerald-400' },
   completed: { label: 'Completed', dot: 'bg-blue-500', text: 'text-blue-600 dark:text-blue-400' },
-  wishlist: { label: 'Wishlist', dot: 'bg-amber-500', text: 'text-amber-600 dark:text-amber-400' },
+  paused: { label: 'Paused', dot: 'bg-amber-500', text: 'text-amber-600 dark:text-amber-400' },
+  wishlist: { label: 'Wishlist', dot: 'bg-slate-400', text: 'text-slate-500 dark:text-slate-400' },
   dropped: { label: 'Dropped', dot: 'bg-slate-400', text: 'text-slate-500 dark:text-slate-400' },
 };
 
 const BookshelfCard: React.FC<BookshelfCardProps> = ({ book, index = 0, onClick }) => {
   const progress = book.totalPages > 0 ? Math.round((book.currentPage / book.totalPages) * 100) : 0;
-  const config = statusConfig[book.status];
+  const config = statusConfig[book.status] ?? { label: book.status, dot: 'bg-slate-400', text: 'text-slate-500 dark:text-slate-400' };
 
   return (
     <motion.div
